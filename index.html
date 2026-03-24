@@ -58,7 +58,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:#fafafa;}
 .empty{text-align:center;padding:2.5rem;color:#aaa;font-size:14px;}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:flex-start;justify-content:center;padding-top:3vh;overflow-y:auto;}
 .modal-overlay.open{display:flex;}
-.modal{background:#fff;border-radius:14px;padding:1.75rem;width:680px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.15);margin-bottom:3vh;}
+.modal{background:#fff;border-radius:14px;padding:1.75rem;width:700px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.15);margin-bottom:3vh;}
 .modal-title{font-size:17px;font-weight:600;margin-bottom:1.25rem;}
 .form-row{margin-bottom:14px;}
 .form-label{font-size:12px;color:#888;margin-bottom:5px;display:block;font-weight:500;}
@@ -67,18 +67,22 @@ input:focus,select:focus{border-color:#1a1a1a;}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
 .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:1.5rem;padding-top:12px;border-top:1px solid #f0f0f0;}
-.eq-checklist{max-height:280px;overflow-y:auto;border:1px solid #e8e8e8;border-radius:8px;}
-.eq-check-item{display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;}
+/* 장비 체크리스트 — 장비별 유형 선택 */
+.eq-checklist{max-height:320px;overflow-y:auto;border:1px solid #e8e8e8;border-radius:8px;}
+.eq-check-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #f0f0f0;}
 .eq-check-item:last-child{border-bottom:none;}
-.eq-check-item:hover:not(.disabled){background:#fafafa;}
-.eq-check-item.disabled{opacity:.45;cursor:not-allowed;background:#fafafa;}
-.eq-check-item input[type=checkbox]{width:16px;height:16px;flex-shrink:0;accent-color:#1a1a1a;}
-/* 반출유형 선택 */
-.type-select{display:flex;gap:8px;margin-bottom:0;}
-.type-btn{flex:1;padding:10px;border:1.5px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;color:#888;text-align:center;transition:all .15s;}
-.type-btn.active{border-color:#1a1a1a;background:#f5f5f5;color:#1a1a1a;}
-.type-btn.internal.active{border-color:#8e44ad;background:#f3e5f5;color:#7b1fa2;}
-.internal-notice{background:#f3e5f5;border:1px solid #e1bee7;border-radius:8px;padding:10px 14px;font-size:12px;color:#7b1fa2;margin-top:8px;}
+.eq-check-item.disabled{opacity:.4;cursor:not-allowed;background:#fafafa;}
+.eq-check-item input[type=checkbox]{width:16px;height:16px;flex-shrink:0;accent-color:#1a1a1a;cursor:pointer;}
+.eq-check-item.disabled input[type=checkbox]{cursor:not-allowed;}
+.eq-check-info{flex:1;min-width:0;}
+.eq-check-name{font-size:13px;}
+.eq-check-sub{font-size:11px;color:#888;margin-top:2px;}
+/* 장비별 유형 토글 */
+.item-type-toggle{display:none;gap:4px;flex-shrink:0;}
+.eq-check-item.checked .item-type-toggle{display:flex;}
+.type-pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1.5px solid #ddd;background:#fff;color:#aaa;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.type-pill.normal.active{border-color:#1565c0;background:#e3f2fd;color:#1565c0;}
+.type-pill.internal.active{border-color:#7b1fa2;background:#f3e5f5;color:#7b1fa2;}
 .hdd-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:1rem 1.25rem;margin-bottom:10px;}
 .hdd-project-title{font-size:14px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
 .hdd-chips{display:flex;flex-wrap:wrap;gap:6px;}
@@ -136,22 +140,13 @@ input:focus,select:focus{border-color:#1a1a1a;}
 <div class="modal-overlay" id="modal-request">
   <div class="modal">
     <div class="modal-title">반출 신청</div>
-    <!-- 반출 유형 선택 -->
-    <div class="form-row">
-      <label class="form-label">반출 유형</label>
-      <div class="type-select">
-        <button class="type-btn active" id="type-normal" onclick="setType('normal')">📦 일반 반출<br><span style="font-size:11px;font-weight:400;color:#aaa">촬영 후 반납 예정</span></button>
-        <button class="type-btn internal" id="type-internal" onclick="setType('internal')">🏢 사내 반출<br><span style="font-size:11px;font-weight:400;color:#aaa">사무실 내 사용·반납 유연</span></button>
-      </div>
-      <div class="internal-notice" id="internal-notice" style="display:none">사내 반출은 반납 기한 없이 현황에서만 관리됩니다. 관리부에서 언제든 확인할 수 있어요.</div>
-    </div>
     <div class="form-grid">
       <div class="form-row"><label class="form-label">신청자</label><input type="text" id="req-person" placeholder="이름"></div>
       <div class="form-row"><label class="form-label">프로젝트</label><input type="text" id="req-project" placeholder="프로젝트명 (선택)"></div>
     </div>
-    <div class="form-grid-3" id="req-date-row">
+    <div class="form-grid-3">
       <div class="form-row"><label class="form-label">반출일</label><input type="date" id="req-out"></div>
-      <div class="form-row" id="ret-date-wrap"><label class="form-label">예정 반납일</label><input type="date" id="req-ret"></div>
+      <div class="form-row"><label class="form-label">예정 반납일 <span style="color:#aaa;font-weight:400">(일반 반출 기준)</span></label><input type="date" id="req-ret"></div>
       <div class="form-row"><label class="form-label">승인자</label>
         <select id="req-approver">
           <option value="김종원">김종원</option>
@@ -162,10 +157,18 @@ input:focus,select:focus{border-color:#1a1a1a;}
     </div>
     <div class="form-row"><label class="form-label">메모</label><input type="text" id="req-note" placeholder="(선택)"></div>
     <div class="form-row">
-      <label class="form-label">장비 선택 <span style="color:#aaa;font-weight:400">(반출 중 장비도 표시됩니다)</span></label>
+      <label class="form-label">장비 선택
+        <span style="color:#aaa;font-weight:400"> — 체크 후 각 장비의 반출 유형을 선택해주세요</span>
+      </label>
       <div style="display:flex;gap:8px;margin-bottom:8px;">
         <input type="text" id="req-search" placeholder="장비명 또는 코드 검색" oninput="filterReqList()" style="flex:1;">
         <select id="req-cat-f" onchange="filterReqList()" style="width:auto;min-width:90px;"></select>
+      </div>
+      <!-- 범례 -->
+      <div style="display:flex;gap:8px;margin-bottom:8px;font-size:11px;color:#888;align-items:center;">
+        <span>체크 후 유형 선택 →</span>
+        <span style="padding:2px 8px;border-radius:20px;border:1.5px solid #1565c0;background:#e3f2fd;color:#1565c0;font-weight:600">일반반출</span>
+        <span style="padding:2px 8px;border-radius:20px;border:1.5px solid #7b1fa2;background:#f3e5f5;color:#7b1fa2;font-weight:600">사내반출</span>
       </div>
       <div class="eq-checklist" id="req-eq-list"></div>
     </div>
@@ -218,7 +221,7 @@ input:focus,select:focus{border-color:#1a1a1a;}
       </div>
     </div>
     <div class="form-row"><label class="form-label">장비명 *</label><input type="text" id="eq-name-inp" placeholder="예) DJI Osmo Pocket 3"></div>
-    <div class="form-row"><label class="form-label">모델명</label><input type="text" id="eq-model-inp" placeholder="예) DJI Osmo"></div>
+    <div class="form-row"><label class="form-label">모델명</label><input type="text" id="eq-model-inp"></div>
     <div class="form-grid">
       <div class="form-row"><label class="form-label">수량</label><input type="number" id="eq-qty-inp" value="1" min="1"></div>
       <div class="form-row"><label class="form-label">비고</label><input type="text" id="eq-note-inp" placeholder="(선택)"></div>
@@ -237,51 +240,53 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const app = initializeApp({
-  apiKey: "AIzaSyDufr2BLM54g05ucTpVYi0erwThcsfGj40",
-  authDomain: "vdot-equipment.firebaseapp.com",
-  projectId: "vdot-equipment",
-  storageBucket: "vdot-equipment.firebasestorage.app",
-  messagingSenderId: "906683328740",
-  appId: "1:906683328740:web:98e020ca29107c43c4e4f1"
+  apiKey:"AIzaSyDufr2BLM54g05ucTpVYi0erwThcsfGj40",
+  authDomain:"vdot-equipment.firebaseapp.com",
+  projectId:"vdot-equipment",
+  storageBucket:"vdot-equipment.firebasestorage.app",
+  messagingSenderId:"906683328740",
+  appId:"1:906683328740:web:98e020ca29107c43c4e4f1"
 });
 const db = getFirestore(app);
 
 const TABS=['status','admin','equipment','hdd','backup','history'];
 let EQ=[],CO=[],REQUESTS=[],HDD_PROJECTS=[],BACKUPS=[],tab='status',isAdmin=true,editingEqId=null;
-let lastRequestCount=null, currentType='normal', statusSubTab='all';
+let lastRequestCount=null, statusSubTab='all';
+
+// itemTypes: { [eqId]: 'normal' | 'internal' }  — 신청 모달 내 장비별 유형
+let itemTypes={};
 
 function today(){return new Date().toISOString().split('T')[0];}
 function getEq(id){return EQ.find(e=>e.id===id)||{name:'(삭제된 장비)',cat:'',code:'—'};}
-function eqStatus(id){const a=CO.filter(c=>c.equipIds&&c.equipIds.includes(id)&&c.status!=='returned');return a.length?a[0].status:'in';}
+function eqStatus(id){const a=CO.filter(c=>c.items&&c.items.some(i=>i.eqId===id)&&c.status!=='returned');return a.length?a[0].status:'in';}
+function getItemType(co,eqId){return(co.items||[]).find(i=>i.eqId===eqId)?.type||co.checkoutType||'normal';}
 function getBackup(eqId){return BACKUPS.find(b=>b.eqId===eqId)||{status:'미백업',date:'',manager:'',memo:''};}
+
 function checkOverdue(){
   CO.forEach(c=>{
-    // 사내 반출은 연체 체크 제외
-    if(c.checkoutType==='internal') return;
-    if(c.status==='out'&&c.returnDate<today()) updateDoc(doc(db,'checkouts',c.id),{status:'overdue'});
+    if(c.status==='out'){
+      // 일반반출 장비가 하나라도 있고 반납일 지났으면 연체
+      const hasNormal=(c.items||[]).some(i=>i.type==='normal')||(c.checkoutType==='normal');
+      if(hasNormal&&c.returnDate&&c.returnDate<today()) updateDoc(doc(db,'checkouts',c.id),{status:'overdue'});
+    }
   });
 }
+
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 function setSyncStatus(on){document.getElementById('sync-dot').className='sync-dot'+(on?'':' off');document.getElementById('sync-label').textContent=on?'실시간 연결됨':'연결 중...';}
-function eqTag(id){const eq=getEq(id);return`<span class="eq-code">${eq.code}</span> <span class="eq-name">${eq.name}</span>`;}
+function eqTag(id,type){
+  const eq=getEq(id);
+  const typeBadge=type==='internal'?'<span class="badge badge-internal" style="font-size:10px;padding:1px 6px">사내</span>':'';
+  return`<span class="eq-code">${eq.code}</span> <span class="eq-name">${eq.name}</span>${typeBadge}`;
+}
 
 // 브라우저 알림
-async function requestNotifPermission(){
-  if(!('Notification' in window))return;
-  if(Notification.permission==='default') await Notification.requestPermission();
-}
-function sendNotif(title,body){
-  if(Notification.permission==='granted') new Notification(title,{body,icon:'https://cdn-icons-png.flaticon.com/512/2910/2910790.png'});
-}
+async function requestNotifPermission(){if(!('Notification'in window))return;if(Notification.permission==='default')await Notification.requestPermission();}
+function sendNotif(title,body){if(Notification.permission==='granted')new Notification(title,{body});}
 function checkNewRequests(newReqs){
   const pending=newReqs.filter(r=>r.status==='pending');
   if(lastRequestCount===null){lastRequestCount=pending.length;return;}
-  if(pending.length>lastRequestCount){
-    const n=pending[0];
-    const typeLabel=n.checkoutType==='internal'?'[사내 반출] ':'';
-    sendNotif('📦 새 반출 신청!',`${typeLabel}${n.person} · ${n.project||'프로젝트 미입력'}`);
-    showToast(`새 반출 신청: ${n.person}`);
-  }
+  if(pending.length>lastRequestCount){const n=pending[0];sendNotif('📦 새 반출 신청!',`${n.person} · ${n.project||'프로젝트 미입력'}`);}
   lastRequestCount=pending.length;
 }
 function renderNotifBar(){
@@ -290,43 +295,26 @@ function renderNotifBar(){
   wrap.innerHTML=`<div class="notif-bar"><span>🔔 반출 신청 알림을 받으시겠어요?</span><button class="btn btn-sm btn-primary" onclick="requestNotifPermission()">알림 허용</button></div>`;
 }
 
-// 반출유형 선택
-window.setType=function(type){
-  currentType=type;
-  document.getElementById('type-normal').className='type-btn'+(type==='normal'?' active':'');
-  document.getElementById('type-internal').className='type-btn internal'+(type==='internal'?' active':'');
-  document.getElementById('internal-notice').style.display=type==='internal'?'':'none';
-  document.getElementById('ret-date-wrap').style.opacity=type==='internal'?'0.4':'1';
-  document.getElementById('req-ret').disabled=type==='internal';
-  if(type==='internal') document.getElementById('req-ret').value='';
-};
-
 function startListeners(){
-  onSnapshot(query(collection(db,'equipments'),orderBy('createdAt','asc')),(snap)=>{
-    EQ=snap.docs.map(d=>({id:d.id,...d.data()}));setSyncStatus(true);render();
-  });
-  onSnapshot(query(collection(db,'checkouts'),orderBy('createdAt','desc')),(snap)=>{
-    CO=snap.docs.map(d=>({id:d.id,...d.data()}));checkOverdue();render();
-  });
-  onSnapshot(query(collection(db,'requests'),orderBy('createdAt','desc')),(snap)=>{
-    const nr=snap.docs.map(d=>({id:d.id,...d.data()}));
-    checkNewRequests(nr);REQUESTS=nr;render();
-  });
+  onSnapshot(query(collection(db,'equipments'),orderBy('createdAt','asc')),(snap)=>{EQ=snap.docs.map(d=>({id:d.id,...d.data()}));setSyncStatus(true);render();});
+  onSnapshot(query(collection(db,'checkouts'),orderBy('createdAt','desc')),(snap)=>{CO=snap.docs.map(d=>({id:d.id,...d.data()}));checkOverdue();render();});
+  onSnapshot(query(collection(db,'requests'),orderBy('createdAt','desc')),(snap)=>{const nr=snap.docs.map(d=>({id:d.id,...d.data()}));checkNewRequests(nr);REQUESTS=nr;render();});
   onSnapshot(collection(db,'hddProjects'),(snap)=>{HDD_PROJECTS=snap.docs.map(d=>({id:d.id,...d.data()}));render();});
   onSnapshot(collection(db,'backups'),(snap)=>{BACKUPS=snap.docs.map(d=>({id:d.id,...d.data()}));render();});
 }
 
 function renderStats(){
   const pending=REQUESTS.filter(r=>r.status==='pending').length;
-  const outNormal=CO.filter(c=>c.status==='out'&&c.checkoutType!=='internal').length;
-  const outInternal=CO.filter(c=>c.status==='out'&&c.checkoutType==='internal').length;
+  const activeAll=CO.filter(c=>c.status!=='returned');
+  const outNormal=activeAll.filter(c=>(c.items||[]).some(i=>i.type==='normal')||(c.checkoutType==='normal'&&!(c.items||[]).length)).length;
+  const outInternal=activeAll.filter(c=>(c.items||[]).every(i=>i.type==='internal')&&(c.items||[]).length>0).length;
   const over=CO.filter(c=>c.status==='overdue').length;
   const ret=CO.filter(c=>c.returnedDate===today()).length;
   document.getElementById('stats').innerHTML=`
     <div class="stat-card"><div class="stat-label">전체 장비</div><div class="stat-value">${EQ.length}</div></div>
     <div class="stat-card"><div class="stat-label">승인 대기</div><div class="stat-value pending">${pending}</div></div>
-    <div class="stat-card"><div class="stat-label">반출 중</div><div class="stat-value out">${outNormal}</div></div>
-    <div class="stat-card"><div class="stat-label">사내 반출</div><div class="stat-value internal">${outInternal}</div></div>
+    <div class="stat-card"><div class="stat-label">반출 중</div><div class="stat-value out">${activeAll.length}</div></div>
+    <div class="stat-card"><div class="stat-label">사내 반출 포함</div><div class="stat-value internal">${activeAll.filter(c=>(c.items||[]).some(i=>i.type==='internal')).length}</div></div>
     <div class="stat-card"><div class="stat-label">연체</div><div class="stat-value overdue">${over}</div></div>
     <div class="stat-card"><div class="stat-label">오늘 반납</div><div class="stat-value">${ret}</div></div>`;
   document.getElementById('pending-dot').style.display=pending>0?'':'none';
@@ -335,37 +323,35 @@ function renderStats(){
   renderNotifBar();
 }
 
-function statusBadge(c){
-  if(c.checkoutType==='internal') return '<span class="badge badge-internal">사내 반출</span>';
-  if(c.status==='overdue') return '<span class="badge badge-overdue">연체</span>';
-  return '<span class="badge badge-out">반출 중</span>';
-}
+function hasInternal(c){return(c.items||[]).some(i=>i.type==='internal');}
+function allInternal(c){return(c.items||[]).length>0&&(c.items||[]).every(i=>i.type==='internal');}
 
 function renderStatus(){
   const active=CO.filter(c=>c.status!=='returned');
-  const filtered=statusSubTab==='all'?active:statusSubTab==='internal'?active.filter(c=>c.checkoutType==='internal'):active.filter(c=>c.checkoutType!=='internal');
-  const internalCount=active.filter(c=>c.checkoutType==='internal').length;
-  const normalCount=active.filter(c=>c.checkoutType!=='internal').length;
+  const filtered=statusSubTab==='all'?active
+    :statusSubTab==='internal'?active.filter(c=>hasInternal(c))
+    :active.filter(c=>!allInternal(c));
   const el=document.getElementById('tab-status');
   let html=`<div class="sub-tab-bar">
     <button class="sub-tab${statusSubTab==='all'?' active':''}" onclick="setStatusSubTab('all')">전체 (${active.length})</button>
-    <button class="sub-tab${statusSubTab==='normal'?' active':''}" onclick="setStatusSubTab('normal')">일반 반출 (${normalCount})</button>
-    <button class="sub-tab${statusSubTab==='internal'?' active':''}" onclick="setStatusSubTab('internal')">사내 반출 (${internalCount})</button>
+    <button class="sub-tab${statusSubTab==='normal'?' active':''}" onclick="setStatusSubTab('normal')">일반 반출 포함 (${active.filter(c=>!allInternal(c)).length})</button>
+    <button class="sub-tab${statusSubTab==='internal'?' active':''}" onclick="setStatusSubTab('internal')">사내 반출 포함 (${active.filter(c=>hasInternal(c)).length})</button>
   </div>`;
   if(!filtered.length){el.innerHTML=html+'<div class="empty">반출 중인 장비가 없습니다.</div>';return;}
   html+=`<div class="table-wrap"><table>
-    <thead><tr><th>유형</th><th>신청자</th><th>프로젝트</th><th>장비</th><th>반출일</th><th>예정 반납일</th><th>상태</th><th></th></tr></thead>
+    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 (유형)</th><th>반출일</th><th>예정 반납일</th><th>상태</th><th></th></tr></thead>
     <tbody>${filtered.map(c=>{
-      const typeLabel=c.checkoutType==='internal'?'<span class="badge badge-internal" style="font-size:10px">사내</span>':'<span class="badge badge-out" style="font-size:10px;background:#f5f5f5;color:#888">일반</span>';
-      const eqList=(c.equipIds||[]).map(id=>`<div class="req-eq-row">${eqTag(id)}</div>`).join('');
-      return`<tr${c.checkoutType==='internal'?' style="background:#fdf6ff"':''}>
-        <td>${typeLabel}</td>
+      const items=c.items||[];
+      const eqList=items.map(i=>`<div class="req-eq-row">${eqTag(i.eqId,i.type)}</div>`).join('');
+      const badge=c.status==='overdue'?'<span class="badge badge-overdue">연체</span>':'<span class="badge badge-out">반출 중</span>';
+      const internalBadge=hasInternal(c)?'<span class="badge badge-internal" style="font-size:10px;margin-left:4px">사내포함</span>':'';
+      return`<tr${hasInternal(c)&&allInternal(c)?' style="background:#fdf6ff"':''}>
         <td><strong>${c.person}</strong></td>
         <td>${c.project||'—'}</td>
-        <td style="min-width:200px">${eqList}</td>
+        <td style="min-width:220px">${eqList}</td>
         <td>${c.outDate}</td>
-        <td>${c.checkoutType==='internal'?'<span style="color:#aaa;font-size:12px">유연</span>':c.returnDate}</td>
-        <td>${statusBadge(c)}</td>
+        <td>${allInternal(c)?'<span style="color:#aaa;font-size:12px">유연</span>':c.returnDate||'—'}</td>
+        <td>${badge}${internalBadge}</td>
         <td>${isAdmin?`<div style="display:flex;gap:6px;"><button class="btn btn-sm btn-pdf" onclick="showPdf('${c.id}')">PDF</button><button class="btn btn-sm btn-success" onclick="returnAll('${c.id}')">반납</button></div>`:'—'}</td>
       </tr>`;
     }).join('')}</tbody></table></div>`;
@@ -380,17 +366,17 @@ function renderAdmin(){
   let html=`<div class="section-header"><span class="section-title">승인 대기 ${pending.length}건</span></div>`;
   if(!pending.length) html+='<div class="empty" style="margin-bottom:1.5rem">대기 중인 신청이 없습니다.</div>';
   else html+=`<div class="table-wrap" style="margin-bottom:1.5rem"><table>
-    <thead><tr><th>유형</th><th>신청일시</th><th>신청자</th><th>프로젝트</th><th>승인자</th><th>장비</th><th>반출일</th><th>반납일</th><th></th></tr></thead>
+    <thead><tr><th>신청일시</th><th>신청자</th><th>프로젝트</th><th>승인자</th><th>장비 (유형)</th><th>반출일</th><th>반납일</th><th></th></tr></thead>
     <tbody>${pending.map(r=>{
-      const typeLabel=r.checkoutType==='internal'?'<span class="badge badge-internal" style="font-size:10px">사내</span>':'<span style="font-size:11px;color:#888">일반</span>';
-      return`<tr${r.checkoutType==='internal'?' style="background:#fdf6ff"':''}>
-        <td>${typeLabel}</td>
+      const items=r.items||[];
+      const eqList=items.map(i=>`<div class="req-eq-row">${eqTag(i.eqId,i.type)}</div>`).join('');
+      return`<tr>
         <td style="font-size:11px;color:#888;white-space:nowrap">${r.createdAtStr||''}</td>
         <td><strong>${r.person}</strong></td><td>${r.project||'—'}</td>
         <td><strong>${r.approver||'—'}</strong></td>
-        <td style="min-width:200px">${(r.equipIds||[]).map(id=>`<div class="req-eq-row">${eqTag(id)}</div>`).join('')}</td>
+        <td style="min-width:220px">${eqList}</td>
         <td>${r.outDate}</td>
-        <td>${r.checkoutType==='internal'?'<span style="color:#aaa;font-size:12px">유연</span>':r.returnDate}</td>
+        <td>${items.every(i=>i.type==='internal')?'<span style="color:#aaa;font-size:12px">유연</span>':r.returnDate||'—'}</td>
         <td><div style="display:flex;gap:6px;">
           <button class="btn btn-sm btn-success" onclick="approveRequest('${r.id}')">승인</button>
           <button class="btn btn-sm btn-danger" onclick="rejectRequest('${r.id}')">반려</button>
@@ -399,12 +385,10 @@ function renderAdmin(){
     }).join('')}</tbody></table></div>`;
   html+=`<div class="section-header"><span class="section-title">처리 완료</span></div>`;
   html+=done.length?`<div class="table-wrap"><table>
-    <thead><tr><th>유형</th><th>신청자</th><th>프로젝트</th><th>장비 수</th><th>반출일</th><th>결과</th></tr></thead>
-    <tbody>${done.map(r=>`<tr>
-      <td>${r.checkoutType==='internal'?'<span class="badge badge-internal" style="font-size:10px">사내</span>':'<span style="font-size:11px;color:#888">일반</span>'}</td>
-      <td>${r.person}</td><td>${r.project||'—'}</td><td>${(r.equipIds||[]).length}개</td><td>${r.outDate}</td>
-      <td>${r.status==='approved'?'<span class="badge badge-in">승인</span>':'<span class="badge badge-rejected">반려</span>'}</td>
-    </tr>`).join('')}</tbody></table></div>`:'<div class="empty">처리된 신청이 없습니다.</div>';
+    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 수</th><th>반출일</th><th>결과</th></tr></thead>
+    <tbody>${done.map(r=>`<tr><td>${r.person}</td><td>${r.project||'—'}</td><td>${(r.items||[]).length}개</td><td>${r.outDate}</td>
+      <td>${r.status==='approved'?'<span class="badge badge-in">승인</span>':'<span class="badge badge-rejected">반려</span>'}</td></tr>`).join('')}
+    </tbody></table></div>`:'<div class="empty">처리된 신청이 없습니다.</div>';
   document.getElementById('tab-admin').innerHTML=html;
 }
 
@@ -422,13 +406,12 @@ function renderEquipment(){
     <div class="table-wrap"><table>
       <thead><tr><th>코드</th><th>장비명</th><th>카테고리</th><th>수량</th><th>비고</th><th>상태</th>${isAdmin?'<th></th>':''}</tr></thead>
       <tbody>${filtered.map(e=>{
-        const st=eqStatus(e.id);
-        const activeCheckout=CO.find(c=>c.equipIds&&c.equipIds.includes(e.id)&&c.status!=='returned');
-        const badge=activeCheckout?.checkoutType==='internal'
-          ?'<span class="badge badge-internal">사내 반출</span>'
-          :st==='overdue'?'<span class="badge badge-overdue">연체</span>'
-          :st==='out'?'<span class="badge badge-out">반출 중</span>'
-          :'<span class="badge badge-in">보유 중</span>';
+        const activeC=CO.find(c=>c.status!=='returned'&&(c.items||[]).some(i=>i.eqId===e.id));
+        const itemType=activeC?(activeC.items||[]).find(i=>i.eqId===e.id)?.type||'normal':null;
+        const badge=!activeC?'<span class="badge badge-in">보유 중</span>'
+          :itemType==='internal'?'<span class="badge badge-internal">사내 반출</span>'
+          :activeC.status==='overdue'?'<span class="badge badge-overdue">연체</span>'
+          :'<span class="badge badge-out">반출 중</span>';
         return`<tr>
           <td><span class="eq-code">${e.code}</span></td>
           <td><span class="eq-name">${e.name}</span>${e.note?`<br><span style="font-size:11px;color:#bbb">${e.note}</span>`:''}</td>
@@ -446,14 +429,13 @@ function renderHdd(){
   const hddEqs=EQ.filter(e=>e.cat==='SSD'||e.cat==='HDD');
   const usedIds=HDD_PROJECTS.flatMap(p=>p.equipIds||[]);
   const unused=hddEqs.filter(e=>!usedIds.includes(e.id));
-  function backupChipClass(eqId){const bk=getBackup(eqId);if(bk.status==='백업 완료')return 'backed';if(bk.status==='백업 중')return 'backing';return '';}
-  function backupBadge(eqId){const bk=getBackup(eqId);if(bk.status==='백업 완료')return '<span class="badge badge-backup-done" style="font-size:10px;margin-left:4px">백업완료</span>';if(bk.status==='백업 중')return '<span class="badge badge-backup" style="font-size:10px;margin-left:4px">백업중</span>';if(bk.status==='미백업')return '<span class="badge" style="font-size:10px;margin-left:4px;background:#fff3e0;color:#e65100">미백업</span>';return '';}
+  function bkClass(id){const bk=getBackup(id);return bk.status==='백업 완료'?'backed':bk.status==='백업 중'?'backing':'';}
+  function bkBadge(id){const bk=getBackup(id);return bk.status==='백업 완료'?'<span class="badge badge-backup-done" style="font-size:10px;margin-left:4px">백업완료</span>':bk.status==='백업 중'?'<span class="badge badge-backup" style="font-size:10px;margin-left:4px">백업중</span>':bk.status==='미백업'?'<span class="badge" style="font-size:10px;margin-left:4px;background:#fff3e0;color:#e65100">미백업</span>':'';}
   let html=`<div class="section-header"><span class="section-title">프로젝트별 외장하드</span>${isAdmin?`<button class="btn btn-sm btn-primary" onclick="openHdd()">+ 프로젝트 연결</button>`:''}</div>`;
   html+=HDD_PROJECTS.length?HDD_PROJECTS.map(p=>{
     const eqs=(p.equipIds||[]).map(id=>getEq(id));
-    return`<div class="hdd-card">
-      <div class="hdd-project-title"><span>${p.project}</span>${isAdmin?`<button class="btn btn-sm btn-danger" onclick="deleteHddProject('${p.id}')">삭제</button>`:''}</div>
-      <div class="hdd-chips">${eqs.map(e=>`<span class="hdd-chip ${backupChipClass(e.id)}"><span class="eq-code" style="font-size:11px">${e.code}</span><span class="eq-name" style="font-size:12px">${e.name}</span>${backupBadge(e.id)}</span>`).join('')}</div>
+    return`<div class="hdd-card"><div class="hdd-project-title"><span>${p.project}</span>${isAdmin?`<button class="btn btn-sm btn-danger" onclick="deleteHddProject('${p.id}')">삭제</button>`:''}</div>
+      <div class="hdd-chips">${eqs.map(e=>`<span class="hdd-chip ${bkClass(e.id)}"><span class="eq-code" style="font-size:11px">${e.code}</span><span class="eq-name" style="font-size:12px">${e.name}</span>${bkBadge(e.id)}</span>`).join('')}</div>
     </div>`;
   }).join(''):'<div class="empty" style="margin-bottom:1rem">연결된 프로젝트가 없습니다.</div>';
   html+=`<div class="section-header" style="margin-top:1.5rem"><span class="section-title">미배정 외장하드 (${unused.length}개)</span></div>`;
@@ -461,10 +443,11 @@ function renderHdd(){
     <thead><tr><th>코드</th><th>장비명</th><th>종류</th><th>백업 상태</th><th>상태</th></tr></thead>
     <tbody>${unused.map(e=>{
       const bk=getBackup(e.id);
-      const bkBadge=bk.status==='백업 완료'?'<span class="badge badge-backup-done">백업완료</span>':bk.status==='백업 중'?'<span class="badge badge-backup">백업중</span>':'<span style="color:#bbb;font-size:12px">—</span>';
-      const activeC=CO.find(c=>c.equipIds&&c.equipIds.includes(e.id)&&c.status!=='returned');
-      const stBadge=activeC?.checkoutType==='internal'?'<span class="badge badge-internal">사내 반출</span>':eqStatus(e.id)==='out'?'<span class="badge badge-out">반출 중</span>':'<span class="badge badge-in">보유 중</span>';
-      return`<tr><td><span class="eq-code">${e.code}</span></td><td><span class="eq-name">${e.name}</span></td><td><span class="cat-badge">${e.cat}</span></td><td>${bkBadge}</td><td>${stBadge}</td></tr>`;
+      const activeC=CO.find(c=>c.status!=='returned'&&(c.items||[]).some(i=>i.eqId===e.id));
+      const itemType=activeC?(activeC.items||[]).find(i=>i.eqId===e.id)?.type:null;
+      const stBadge=!activeC?'<span class="badge badge-in">보유 중</span>':itemType==='internal'?'<span class="badge badge-internal">사내 반출</span>':'<span class="badge badge-out">반출 중</span>';
+      const bkB=bk.status==='백업 완료'?'<span class="badge badge-backup-done">백업완료</span>':bk.status==='백업 중'?'<span class="badge badge-backup">백업중</span>':'<span style="color:#bbb;font-size:12px">—</span>';
+      return`<tr><td><span class="eq-code">${e.code}</span></td><td><span class="eq-name">${e.name}</span></td><td><span class="cat-badge">${e.cat}</span></td><td>${bkB}</td><td>${stBadge}</td></tr>`;
     }).join('')}</tbody></table></div>`:'<div class="empty">모든 외장하드가 프로젝트에 배정되어 있습니다.</div>';
   document.getElementById('tab-hdd').innerHTML=html;
 }
@@ -472,7 +455,7 @@ function renderHdd(){
 function renderBackup(){
   const hddEqs=EQ.filter(e=>e.cat==='SSD'||e.cat==='HDD');
   const statusOpts=['미백업','백업 중','백업 완료','해당없음'];
-  const statusStyle={'백업 완료':'color:#27ae60;font-weight:600','백업 중':'color:#e67e22;font-weight:600','미백업':'color:#c0392b;font-weight:600','해당없음':'color:#aaa'};
+  const ss={'백업 완료':'color:#27ae60;font-weight:600','백업 중':'color:#e67e22;font-weight:600','미백업':'color:#c0392b;font-weight:600','해당없음':'color:#aaa'};
   document.getElementById('tab-backup').innerHTML=`
     <div class="section-header"><span class="section-title">외장하드 백업 현황 (${hddEqs.length}개)</span></div>
     <div class="table-wrap"><table>
@@ -481,11 +464,10 @@ function renderBackup(){
         const proj=HDD_PROJECTS.find(p=>(p.equipIds||[]).includes(e.id));
         const bk=getBackup(e.id);
         return`<tr>
-          <td><span class="eq-code">${e.code}</span></td>
-          <td><span class="eq-name">${e.name}</span></td>
+          <td><span class="eq-code">${e.code}</span></td><td><span class="eq-name">${e.name}</span></td>
           <td><span class="cat-badge">${e.cat}</span></td>
           <td>${proj?proj.project:'<span style="color:#bbb">미배정</span>'}</td>
-          <td>${isAdmin?`<select onchange="updateBackup('${e.id}','status',this.value)" style="width:auto;font-size:12px;padding:4px 8px;">${statusOpts.map(s=>`<option${bk.status===s?' selected':''}>${s}</option>`).join('')}</select>`:`<span style="${statusStyle[bk.status]||''}">${bk.status}</span>`}</td>
+          <td>${isAdmin?`<select onchange="updateBackup('${e.id}','status',this.value)" style="width:auto;font-size:12px;padding:4px 8px;">${statusOpts.map(s=>`<option${bk.status===s?' selected':''}>${s}</option>`).join('')}</select>`:`<span style="${ss[bk.status]||''}">${bk.status}</span>`}</td>
           <td>${isAdmin?`<input type="date" value="${bk.date||''}" onchange="updateBackup('${e.id}','date',this.value)" style="width:130px;font-size:12px;padding:4px 8px;">`:(bk.date||'—')}</td>
           <td>${isAdmin?`<input type="text" value="${bk.manager||''}" placeholder="담당자" onchange="updateBackup('${e.id}','manager',this.value)" style="width:80px;font-size:12px;padding:4px 8px;">`:(bk.manager||'—')}</td>
           <td>${isAdmin?`<input type="text" value="${bk.memo||''}" placeholder="메모" onchange="updateBackup('${e.id}','memo',this.value)" style="font-size:12px;padding:4px 8px;">`:(bk.memo||'—')}</td>
@@ -496,11 +478,10 @@ function renderBackup(){
 function renderHistory(){
   const returned=CO.filter(c=>c.status==='returned');
   document.getElementById('tab-history').innerHTML=`<div class="table-wrap"><table>
-    <thead><tr><th>유형</th><th>신청자</th><th>프로젝트</th><th>장비</th><th>반출일</th><th>반납일</th><th>메모</th></tr></thead>
-    <tbody>${returned.length===0?`<tr><td colspan="7"><div class="empty">반납 완료된 이력이 없습니다.</div></td></tr>`:returned.map(c=>`<tr>
-      <td>${c.checkoutType==='internal'?'<span class="badge badge-internal" style="font-size:10px">사내</span>':'<span style="font-size:11px;color:#888">일반</span>'}</td>
+    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 (유형)</th><th>반출일</th><th>반납일</th><th>메모</th></tr></thead>
+    <tbody>${returned.length===0?`<tr><td colspan="6"><div class="empty">반납 완료된 이력이 없습니다.</div></td></tr>`:returned.map(c=>`<tr>
       <td>${c.person}</td><td>${c.project||'—'}</td>
-      <td style="min-width:200px">${(c.equipIds||[]).map(id=>`<div class="req-eq-row">${eqTag(id)}</div>`).join('')}</td>
+      <td style="min-width:200px">${(c.items||[]).map(i=>`<div class="req-eq-row">${eqTag(i.eqId,i.type)}</div>`).join('')}</td>
       <td>${c.outDate}</td><td>${c.returnedDate||'—'}</td>
       <td style="font-size:12px;color:#888">${c.note||'—'}</td>
     </tr>`).join('')}</tbody></table></div>`;
@@ -516,25 +497,18 @@ function render(){
   else renderHistory();
 }
 
-window.switchTab=function(t,el){
-  tab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');
-  TABS.forEach(x=>{document.getElementById('tab-'+x).style.display=x===t?'':'none';});render();
-};
+window.switchTab=function(t,el){tab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');TABS.forEach(x=>{document.getElementById('tab-'+x).style.display=x===t?'':'none';});render();};
 window.toggleRole=function(){isAdmin=!isAdmin;render();};
 window.renderEquipment=renderEquipment;
 
+// 반출 신청 모달
 window.openRequest=function(){
   ['req-person','req-project','req-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('req-out').value=today();
   document.getElementById('req-ret').value='';
-  document.getElementById('req-ret').disabled=false;
-  document.getElementById('ret-date-wrap').style.opacity='1';
   document.getElementById('req-approver').value='김종원';
   document.getElementById('req-search').value='';
-  document.getElementById('internal-notice').style.display='none';
-  currentType='normal';
-  document.getElementById('type-normal').className='type-btn active';
-  document.getElementById('type-internal').className='type-btn internal';
+  itemTypes={};
   const cats=[...new Set(EQ.map(e=>e.cat))];
   document.getElementById('req-cat-f').innerHTML='<option value="">전체</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
   buildReqList('','');
@@ -545,37 +519,74 @@ function buildReqList(search,cat){
   const filtered=EQ.filter(e=>(!cat||e.cat===cat)&&(!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search)));
   document.getElementById('req-eq-list').innerHTML=filtered.map(e=>{
     const isOut=eqStatus(e.id)!=='in';
-    return`<label class="eq-check-item${isOut?' disabled':''}">
-      <input type="checkbox" data-eq="${e.id}" ${isOut?'disabled':''} onchange="updateReqSummary()">
-      <div style="flex:1"><div><span class="eq-code">${e.code}</span> <span class="eq-name">${e.name}</span></div>
-      <div style="font-size:11px;color:#888;margin-top:2px">${e.cat}${e.note?' · '+e.note:''}</div></div>
+    const checked=itemTypes[e.id]!==undefined;
+    const curType=itemTypes[e.id]||'normal';
+    return`<div class="eq-check-item${isOut?' disabled':''}${checked?' checked':''}" id="item-row-${e.id}">
+      <input type="checkbox" data-eq="${e.id}" ${isOut?'disabled':''} ${checked?'checked':''} onchange="toggleEqItem('${e.id}',this.checked)">
+      <div class="eq-check-info">
+        <div class="eq-check-name"><span class="eq-code">${e.code}</span> <span class="eq-name">${e.name}</span></div>
+        <div class="eq-check-sub">${e.cat}${e.note?' · '+e.note:''}</div>
+      </div>
+      <div class="item-type-toggle" id="toggle-${e.id}">
+        <button class="type-pill normal${curType==='normal'?' active':''}" onclick="setItemType('${e.id}','normal')">일반반출</button>
+        <button class="type-pill internal${curType==='internal'?' active':''}" onclick="setItemType('${e.id}','internal')">사내반출</button>
+      </div>
       ${isOut?'<span class="badge badge-out" style="font-size:10px;white-space:nowrap">반출 중</span>':''}
-    </label>`;
+    </div>`;
   }).join('');
   updateReqSummary();
 }
 
+window.toggleEqItem=function(eqId,checked){
+  const row=document.getElementById('item-row-'+eqId);
+  if(checked){itemTypes[eqId]='normal';row.classList.add('checked');}
+  else{delete itemTypes[eqId];row.classList.remove('checked');}
+  updateReqSummary();
+};
+
+window.setItemType=function(eqId,type){
+  itemTypes[eqId]=type;
+  const toggle=document.getElementById('toggle-'+eqId);
+  if(toggle){
+    toggle.querySelectorAll('.type-pill').forEach(p=>p.classList.remove('active'));
+    toggle.querySelector('.type-pill.'+type)?.classList.add('active');
+  }
+  updateReqSummary();
+};
+
 window.filterReqList=function(){
   const search=document.getElementById('req-search').value.toLowerCase();
   const cat=document.getElementById('req-cat-f').value;
-  const checked=new Set([...document.querySelectorAll('#req-eq-list input:checked')].map(i=>i.dataset.eq));
   const filtered=EQ.filter(e=>(!cat||e.cat===cat)&&(!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search)));
   document.getElementById('req-eq-list').innerHTML=filtered.map(e=>{
     const isOut=eqStatus(e.id)!=='in';
-    const wasChecked=checked.has(e.id)&&!isOut;
-    return`<label class="eq-check-item${isOut?' disabled':''}">
-      <input type="checkbox" data-eq="${e.id}" ${isOut?'disabled':''} ${wasChecked?'checked':''} onchange="updateReqSummary()">
-      <div style="flex:1"><div><span class="eq-code">${e.code}</span> <span class="eq-name">${e.name}</span></div>
-      <div style="font-size:11px;color:#888;margin-top:2px">${e.cat}${e.note?' · '+e.note:''}</div></div>
+    const checked=itemTypes[e.id]!==undefined;
+    const curType=itemTypes[e.id]||'normal';
+    return`<div class="eq-check-item${isOut?' disabled':''}${checked?' checked':''}" id="item-row-${e.id}">
+      <input type="checkbox" data-eq="${e.id}" ${isOut?'disabled':''} ${checked?'checked':''} onchange="toggleEqItem('${e.id}',this.checked)">
+      <div class="eq-check-info">
+        <div class="eq-check-name"><span class="eq-code">${e.code}</span> <span class="eq-name">${e.name}</span></div>
+        <div class="eq-check-sub">${e.cat}${e.note?' · '+e.note:''}</div>
+      </div>
+      <div class="item-type-toggle" id="toggle-${e.id}">
+        <button class="type-pill normal${curType==='normal'?' active':''}" onclick="setItemType('${e.id}','normal')">일반반출</button>
+        <button class="type-pill internal${curType==='internal'?' active':''}" onclick="setItemType('${e.id}','internal')">사내반출</button>
+      </div>
       ${isOut?'<span class="badge badge-out" style="font-size:10px;white-space:nowrap">반출 중</span>':''}
-    </label>`;
+    </div>`;
   }).join('');
   updateReqSummary();
 };
+
 window.updateReqSummary=function(){
-  const n=document.querySelectorAll('#req-eq-list input:checked').length;
-  document.getElementById('req-summary').textContent=n?`${n}개 장비 선택됨`:'';
+  const keys=Object.keys(itemTypes);
+  const normal=keys.filter(k=>itemTypes[k]==='normal').length;
+  const internal=keys.filter(k=>itemTypes[k]==='internal').length;
+  let msg='';
+  if(keys.length) msg=`${keys.length}개 선택 (일반 ${normal}개 · 사내 ${internal}개)`;
+  document.getElementById('req-summary').textContent=msg;
 };
+
 window.closeModal=function(id){document.getElementById(id).classList.remove('open');};
 window.requestNotifPermission=requestNotifPermission;
 
@@ -583,29 +594,33 @@ window.submitRequest=async function(){
   const person=document.getElementById('req-person').value.trim();
   const project=document.getElementById('req-project').value.trim();
   const outDate=document.getElementById('req-out').value;
-  const returnDate=currentType==='internal'?'':document.getElementById('req-ret').value;
+  const returnDate=document.getElementById('req-ret').value;
   const approver=document.getElementById('req-approver').value;
-  const equipIds=[...document.querySelectorAll('#req-eq-list input:checked')].map(i=>i.dataset.eq);
+  const items=Object.entries(itemTypes).map(([eqId,type])=>({eqId,type}));
   if(!person||!outDate){alert('신청자와 반출일을 입력해주세요.');return;}
-  if(currentType==='normal'&&!returnDate){alert('예정 반납일을 입력해주세요.');return;}
-  if(!equipIds.length){alert('장비를 1개 이상 선택해주세요.');return;}
+  const hasNormal=items.some(i=>i.type==='normal');
+  if(hasNormal&&!returnDate){alert('일반 반출 장비가 있으면 예정 반납일을 입력해주세요.');return;}
+  if(!items.length){alert('장비를 1개 이상 선택해주세요.');return;}
   const now=new Date();
   const createdAtStr=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  await addDoc(collection(db,'requests'),{person,project,outDate,returnDate,approver,equipIds,checkoutType:currentType,note:document.getElementById('req-note').value.trim(),status:'pending',createdAt:Date.now(),createdAtStr});
-  showToast(currentType==='internal'?'사내 반출 신청 완료!':'반출 신청 완료! 승인을 기다려주세요.');
+  await addDoc(collection(db,'requests'),{person,project,outDate,returnDate:hasNormal?returnDate:'',approver,items,note:document.getElementById('req-note').value.trim(),status:'pending',createdAt:Date.now(),createdAtStr});
+  showToast('반출 신청 완료! 승인을 기다려주세요.');
   closeModal('modal-request');
 };
 
 window.approveRequest=async function(id){
   const r=REQUESTS.find(x=>x.id===id);if(!r)return;
   await updateDoc(doc(db,'requests',id),{status:'approved'});
-  await addDoc(collection(db,'checkouts'),{person:r.person,project:r.project,equipIds:r.equipIds,outDate:r.outDate,returnDate:r.returnDate||'',approver:r.approver,note:r.note,checkoutType:r.checkoutType||'normal',status:'out',returnedDate:'',createdAt:Date.now()});
+  const hasNormal=(r.items||[]).some(i=>i.type==='normal');
+  await addDoc(collection(db,'checkouts'),{person:r.person,project:r.project,items:r.items||[],outDate:r.outDate,returnDate:r.returnDate||'',approver:r.approver,note:r.note,status:'out',returnedDate:'',createdAt:Date.now()});
   showToast('승인 완료');
 };
+
 window.rejectRequest=async function(id){
   if(!confirm('신청을 반려하시겠습니까?'))return;
   await updateDoc(doc(db,'requests',id),{status:'rejected'});showToast('반려 처리됨');
 };
+
 window.returnAll=async function(id){
   if(!confirm('반납 처리하시겠습니까?'))return;
   await updateDoc(doc(db,'checkouts',id),{status:'returned',returnedDate:today()});showToast('반납 처리 완료');
@@ -613,20 +628,23 @@ window.returnAll=async function(id){
 
 window.showPdf=function(id){
   const c=CO.find(x=>x.id===id);if(!c)return;
-  const eqs=(c.equipIds||[]).map(id=>getEq(id));
-  const typeLabel=c.checkoutType==='internal'?'사내 반출':'일반 반출';
+  const items=c.items||[];
+  const normalItems=items.filter(i=>i.type==='normal');
+  const internalItems=items.filter(i=>i.type==='internal');
+  function rows(arr,label){
+    return arr.map((i,idx)=>{const e=getEq(i.eqId);return`<tr><td>${idx+1}</td><td>${e.code}</td><td>${e.cat}</td><td>${e.name}</td><td>${label}</td><td>1</td><td></td></tr>`;}).join('');
+  }
   document.getElementById('pdf-content').innerHTML=`
     <h2>(주)브이닷 장비 반출 신청서</h2>
     <div class="meta">
-      <div class="meta-item"><span class="meta-label">반출 유형</span><strong>${typeLabel}</strong></div>
       <div class="meta-item"><span class="meta-label">신청자</span><strong>${c.person}</strong></div>
       <div class="meta-item"><span class="meta-label">프로젝트</span><strong>${c.project||'—'}</strong></div>
       <div class="meta-item"><span class="meta-label">반출일</span><strong>${c.outDate}</strong></div>
-      ${c.checkoutType!=='internal'?`<div class="meta-item"><span class="meta-label">예정 반납일</span><strong>${c.returnDate}</strong></div>`:''}
+      ${normalItems.length?`<div class="meta-item"><span class="meta-label">예정 반납일</span><strong>${c.returnDate}</strong></div>`:''}
       ${c.note?`<div class="meta-item" style="grid-column:span 2"><span class="meta-label">메모</span>${c.note}</div>`:''}
     </div>
-    <table><thead><tr><th>NO</th><th>코드</th><th>분류</th><th>장비명</th><th>수량</th><th>확인</th></tr></thead>
-    <tbody>${eqs.map((e,i)=>`<tr><td>${i+1}</td><td>${e.code}</td><td>${e.cat}</td><td>${e.name}</td><td>1</td><td></td></tr>`).join('')}</tbody></table>
+    <table><thead><tr><th>NO</th><th>코드</th><th>분류</th><th>장비명</th><th>유형</th><th>수량</th><th>확인</th></tr></thead>
+    <tbody>${rows(normalItems,'일반반출')}${rows(internalItems,'사내반출')}</tbody></table>
     <div class="sign-area">
       <div class="sign-box"><div class="sign-label">신청자</div><div class="sign-name">${c.person}</div></div>
       <div class="sign-box"><div class="sign-label">승인자</div><div class="sign-name">${c.approver||'—'}</div></div>
