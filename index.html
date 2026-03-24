@@ -5,62 +5,100 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VDOT 장비 관리</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; }
-  .app { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
-  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
-  .brand { font-size: 12px; font-weight: 600; color: #888; letter-spacing: 0.1em; }
-  .title { font-size: 22px; font-weight: 600; color: #1a1a1a; }
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 2rem; }
-  .stat-card { background: #fff; border-radius: 10px; padding: 16px 20px; border: 1px solid #e8e8e8; }
-  .stat-label { font-size: 11px; color: #888; margin-bottom: 6px; font-weight: 500; }
-  .stat-value { font-size: 24px; font-weight: 600; color: #1a1a1a; }
-  .stat-value.out { color: #1a6fb8; }
-  .stat-value.overdue { color: #c0392b; }
-  .tab-bar { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 1px solid #e0e0e0; }
-  .tab { padding: 10px 20px; font-size: 14px; cursor: pointer; border: none; background: none; color: #888; border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: inherit; }
-  .tab.active { color: #1a1a1a; border-bottom-color: #1a1a1a; font-weight: 600; }
-  .btn { padding: 8px 16px; font-size: 13px; border-radius: 8px; border: 1px solid #ddd; background: #fff; color: #1a1a1a; cursor: pointer; font-family: inherit; font-weight: 500; }
-  .btn:hover { background: #f5f5f5; }
-  .btn-primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-  .btn-primary:hover { background: #333; }
-  .btn-sm { padding: 5px 12px; font-size: 12px; }
-  .btn-danger { border-color: #e0b0b0; color: #c0392b; }
-  .btn-danger:hover { background: #fff0f0; }
-  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .section-title { font-size: 13px; font-weight: 600; color: #888; }
-  .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; }
-  .filter-bar select, .filter-bar input { padding: 7px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff; color: #1a1a1a; outline: none; }
-  .filter-bar input { flex: 1; }
-  .table-wrap { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; overflow: hidden; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { background: #fafafa; padding: 10px 16px; text-align: left; font-weight: 600; font-size: 11px; color: #888; border-bottom: 1px solid #e8e8e8; text-transform: uppercase; letter-spacing: 0.05em; }
-  td { padding: 11px 16px; border-bottom: 1px solid #f0f0f0; color: #1a1a1a; vertical-align: middle; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #fafafa; }
-  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-  .badge-in { background: #e8f5e9; color: #2e7d32; }
-  .badge-out { background: #e3f2fd; color: #1565c0; }
-  .badge-overdue { background: #ffebee; color: #c62828; }
-  .cat-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; background: #f0f0f0; color: #555; }
-  .code { font-family: monospace; font-size: 12px; color: #666; background: #f5f5f5; padding: 2px 6px; border-radius: 4px; }
-  .empty { text-align: center; padding: 2.5rem; color: #aaa; font-size: 14px; }
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: #fff; border-radius: 14px; padding: 1.75rem; width: 480px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
-  .modal-title { font-size: 17px; font-weight: 600; margin-bottom: 1.25rem; }
-  .form-row { margin-bottom: 14px; }
-  .form-label { font-size: 12px; color: #888; margin-bottom: 5px; display: block; font-weight: 500; }
-  input[type=text], input[type=date], input[type=number], select, textarea { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff; color: #1a1a1a; outline: none; }
-  input:focus, select:focus { border-color: #1a1a1a; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.5rem; }
-  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: #1a1a1a; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
-  .toast.show { opacity: 1; }
-  @media (max-width: 600px) {
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .form-grid { grid-template-columns: 1fr; }
-  }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#1a1a1a;}
+.app{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+.brand{font-size:12px;font-weight:600;color:#888;letter-spacing:.1em;}
+.title{font-size:22px;font-weight:600;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.role-badge{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;background:#1a1a1a;color:#fff;cursor:pointer;}
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:2rem;}
+.stat-card{background:#fff;border-radius:10px;padding:14px 18px;border:1px solid #e8e8e8;}
+.stat-label{font-size:11px;color:#888;margin-bottom:5px;font-weight:500;}
+.stat-value{font-size:22px;font-weight:600;}
+.stat-value.pending{color:#e67e22;}
+.stat-value.out{color:#1a6fb8;}
+.stat-value.overdue{color:#c0392b;}
+.tab-bar{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:1px solid #e0e0e0;overflow-x:auto;}
+.tab{padding:10px 18px;font-size:13px;cursor:pointer;border:none;background:none;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;white-space:nowrap;}
+.tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a;font-weight:600;}
+.tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#e67e22;margin-left:5px;vertical-align:middle;}
+.btn{padding:8px 16px;font-size:13px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#1a1a1a;cursor:pointer;font-family:inherit;font-weight:500;}
+.btn:hover{background:#f5f5f5;}
+.btn-primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+.btn-primary:hover{background:#333;}
+.btn-success{background:#27ae60;color:#fff;border-color:#27ae60;}
+.btn-success:hover{background:#219a52;}
+.btn-danger{border-color:#e0b0b0;color:#c0392b;}
+.btn-danger:hover{background:#fff0f0;}
+.btn-warning{background:#e67e22;color:#fff;border-color:#e67e22;}
+.btn-warning:hover{background:#d35400;}
+.btn-pdf{background:#8e44ad;color:#fff;border-color:#8e44ad;}
+.btn-pdf:hover{background:#7d3c98;}
+.btn-sm{padding:5px 11px;font-size:12px;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.section-title{font-size:13px;font-weight:600;color:#888;}
+.filter-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.filter-bar select,.filter-bar input{padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;background:#fff;color:#1a1a1a;outline:none;}
+.filter-bar input{flex:1;min-width:150px;}
+.table-wrap{background:#fff;border:1px solid #e8e8e8;border-radius:10px;overflow:hidden;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:#fafafa;padding:9px 14px;text-align:left;font-weight:600;font-size:11px;color:#888;border-bottom:1px solid #e8e8e8;white-space:nowrap;}
+td{padding:10px 14px;border-bottom:1px solid #f0f0f0;color:#1a1a1a;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafafa;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-in{background:#e8f5e9;color:#2e7d32;}
+.badge-out{background:#e3f2fd;color:#1565c0;}
+.badge-overdue{background:#ffebee;color:#c62828;}
+.badge-pending{background:#fff3e0;color:#e65100;}
+.badge-rejected{background:#f5f5f5;color:#888;}
+.cat-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;background:#f0f0f0;color:#555;}
+.code{font-family:monospace;font-size:12px;color:#666;background:#f5f5f5;padding:2px 6px;border-radius:4px;}
+.empty{text-align:center;padding:2.5rem;color:#aaa;font-size:14px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff;border-radius:14px;padding:1.75rem;width:640px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.15);max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:17px;font-weight:600;margin-bottom:1.25rem;}
+.form-row{margin-bottom:14px;}
+.form-label{font-size:12px;color:#888;margin-bottom:5px;display:block;font-weight:500;}
+input[type=text],input[type=date],input[type=number],select,textarea{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;background:#fff;color:#1a1a1a;outline:none;}
+input:focus,select:focus,textarea:focus{border-color:#1a1a1a;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:1.5rem;}
+.eq-checklist{max-height:320px;overflow-y:auto;border:1px solid #e8e8e8;border-radius:8px;}
+.eq-check-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;}
+.eq-check-item:last-child{border-bottom:none;}
+.eq-check-item:hover{background:#fafafa;}
+.eq-check-item.disabled{opacity:.45;cursor:not-allowed;}
+.eq-check-item input[type=checkbox]{width:16px;height:16px;flex-shrink:0;cursor:pointer;}
+.eq-check-item.disabled input[type=checkbox]{cursor:not-allowed;}
+.eq-check-info{flex:1;}
+.eq-check-name{font-size:13px;font-weight:500;}
+.eq-check-sub{font-size:11px;color:#888;margin-top:2px;}
+.eq-check-status{font-size:11px;}
+.hdd-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:1rem 1.25rem;margin-bottom:12px;}
+.hdd-project{font-size:14px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.hdd-list{display:flex;flex-wrap:wrap;gap:6px;}
+.hdd-chip{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;background:#e3f2fd;color:#1565c0;border:1px solid #bbdefb;}
+.hdd-chip.available{background:#e8f5e9;color:#2e7d32;border-color:#c8e6c9;}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+.pdf-preview{background:#fff;border:1px solid #ddd;border-radius:8px;padding:2rem;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;}
+.pdf-preview h2{text-align:center;font-size:18px;margin-bottom:1rem;border-bottom:2px solid #1a1a1a;padding-bottom:.5rem;}
+.pdf-preview .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;font-size:13px;}
+.pdf-preview .meta-item{display:flex;gap:8px;}
+.pdf-preview .meta-label{color:#888;min-width:70px;}
+.pdf-preview table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:1rem;}
+.pdf-preview th{background:#f5f5f5;padding:8px;border:1px solid #ddd;text-align:center;font-size:12px;}
+.pdf-preview td{padding:8px;border:1px solid #ddd;text-align:center;}
+.pdf-preview .sign-area{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.5rem;}
+.pdf-preview .sign-box{border:1px solid #ddd;border-radius:6px;padding:12px;text-align:center;}
+.pdf-preview .sign-label{font-size:11px;color:#888;margin-bottom:20px;}
+.pdf-preview .sign-name{font-size:13px;font-weight:600;}
+@media print{body{background:#fff;}.app{padding:0;}.tab-bar,.header,.stats-grid,.modal-footer{display:none;}.modal-overlay{position:static;background:none;display:block;}.modal{box-shadow:none;max-height:none;width:100%;padding:0;}}
+@media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -70,62 +108,81 @@
       <div class="brand">VDOT</div>
       <div class="title">장비 관리</div>
     </div>
-    <button class="btn btn-primary" onclick="openCheckout()">+ 반출 등록</button>
+    <div class="header-right">
+      <div id="role-display" class="role-badge" onclick="toggleRole()">관리자 모드</div>
+      <button class="btn btn-primary" onclick="openRequest()">+ 반출 신청</button>
+    </div>
   </div>
   <div class="stats-grid" id="stats"></div>
   <div class="tab-bar">
     <button class="tab active" onclick="switchTab('status',this)">반출 현황</button>
+    <button class="tab" id="tab-btn-admin" onclick="switchTab('admin',this)">신청 관리 <span class="dot" id="pending-dot" style="display:none"></span></button>
     <button class="tab" onclick="switchTab('equipment',this)">장비 목록</button>
+    <button class="tab" onclick="switchTab('hdd',this)">외장하드</button>
     <button class="tab" onclick="switchTab('history',this)">반출 이력</button>
   </div>
   <div id="tab-status"></div>
+  <div id="tab-admin" style="display:none"></div>
   <div id="tab-equipment" style="display:none"></div>
+  <div id="tab-hdd" style="display:none"></div>
   <div id="tab-history" style="display:none"></div>
 </div>
 
-<div class="modal-overlay" id="modal-checkout">
+<!-- 반출 신청 모달 -->
+<div class="modal-overlay" id="modal-request">
   <div class="modal">
-    <div class="modal-title">반출 등록</div>
-    <div class="form-row"><label class="form-label">장비 선택</label><select id="co-eq"></select></div>
+    <div class="modal-title">반출 신청</div>
     <div class="form-grid">
-      <div class="form-row"><label class="form-label">담당자</label><input type="text" id="co-person" placeholder="이름"></div>
-      <div class="form-row"><label class="form-label">프로젝트</label><input type="text" id="co-proj" placeholder="프로젝트명"></div>
+      <div class="form-row"><label class="form-label">신청자</label><input type="text" id="req-person" placeholder="이름"></div>
+      <div class="form-row"><label class="form-label">프로젝트</label><input type="text" id="req-project" placeholder="프로젝트명"></div>
     </div>
     <div class="form-grid">
-      <div class="form-row"><label class="form-label">반출일</label><input type="date" id="co-out"></div>
-      <div class="form-row"><label class="form-label">예정 반납일</label><input type="date" id="co-ret"></div>
+      <div class="form-row"><label class="form-label">반출일</label><input type="date" id="req-out"></div>
+      <div class="form-row"><label class="form-label">예정 반납일</label><input type="date" id="req-ret"></div>
     </div>
-    <div class="form-row"><label class="form-label">메모</label><input type="text" id="co-note" placeholder="(선택)"></div>
+    <div class="form-row"><label class="form-label">메모</label><input type="text" id="req-note" placeholder="(선택)"></div>
+    <div class="form-row">
+      <label class="form-label">장비 선택 <span style="color:#888;font-weight:400">(반출 중인 장비는 표시만 됩니다)</span></label>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input type="text" id="req-search" placeholder="장비명 또는 코드 검색" oninput="filterReqList()" style="flex:1;">
+        <select id="req-cat-filter" onchange="filterReqList()" style="width:auto;">
+          <option value="">전체</option>
+        </select>
+      </div>
+      <div class="eq-checklist" id="req-eq-list"></div>
+    </div>
+    <div id="req-selected-summary" style="font-size:12px;color:#1a6fb8;margin-top:6px;"></div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeModal('modal-checkout')">취소</button>
-      <button class="btn btn-primary" onclick="submitCheckout()">등록</button>
+      <button class="btn" onclick="closeModal('modal-request')">취소</button>
+      <button class="btn btn-primary" onclick="submitRequest()">신청</button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-equip">
-  <div class="modal">
-    <div class="modal-title">장비 추가</div>
-    <div class="form-grid">
-      <div class="form-row"><label class="form-label">장비 코드</label><input type="text" id="eq-code" placeholder="예) FCAM0001"></div>
-      <div class="form-row"><label class="form-label">카테고리</label>
-        <select id="eq-cat">
-          <option>카메라</option><option>카메라 세트</option><option>배터리</option>
-          <option>오디오</option><option>하드웨어</option><option>보조배터리</option>
-          <option>컴퓨터</option><option>허브</option><option>SD</option><option>기타</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-row"><label class="form-label">품명</label><input type="text" id="eq-name" placeholder="예) DJI Osmo Pocket 3"></div>
-    <div class="form-row"><label class="form-label">모델명</label><input type="text" id="eq-model" placeholder="예) DJI Osmo Pocket 3"></div>
-    <div class="form-grid">
-      <div class="form-row"><label class="form-label">수량</label><input type="number" id="eq-qty" value="1" min="1"></div>
-      <div class="form-row"><label class="form-label">물품 위치</label><input type="text" id="eq-loc" placeholder="예) 201호"></div>
-    </div>
-    <div class="form-row"><label class="form-label">비고</label><input type="text" id="eq-note" placeholder="(선택)"></div>
+<!-- PDF 미리보기 모달 -->
+<div class="modal-overlay" id="modal-pdf">
+  <div class="modal" style="width:720px;">
+    <div class="modal-title">반출 신청서</div>
+    <div class="pdf-preview" id="pdf-content"></div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeModal('modal-equip')">취소</button>
-      <button class="btn btn-primary" onclick="submitEquip()">추가</button>
+      <button class="btn" onclick="closeModal('modal-pdf')">닫기</button>
+      <button class="btn btn-pdf" onclick="window.print()">🖨 인쇄 / PDF 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 외장하드 프로젝트 연결 모달 -->
+<div class="modal-overlay" id="modal-hdd">
+  <div class="modal">
+    <div class="modal-title">외장하드 프로젝트 연결</div>
+    <div class="form-row"><label class="form-label">프로젝트명</label><input type="text" id="hdd-project" placeholder="프로젝트명"></div>
+    <div class="form-row">
+      <label class="form-label">외장하드 선택</label>
+      <div class="eq-checklist" id="hdd-eq-list"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-hdd')">취소</button>
+      <button class="btn btn-primary" onclick="submitHdd()">저장</button>
     </div>
   </div>
 </div>
@@ -133,91 +190,110 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const DEFAULT_EQ = [
-  {id:'e1',code:'FCMS0001',cat:'카메라 세트',name:'DJI Osmo Pocket 3',model:'카메라 세트',qty:1,loc:'201호',note:'삼각대,마이크,소형배터리,윈드스크린'},
-  {id:'e2',code:'FCAM0001',cat:'카메라',name:'DJI Osmo Pocket 3',model:'핸디캠',qty:1,loc:'201호',note:'핸드카메라'},
-  {id:'e3',code:'FBAT0001',cat:'배터리',name:'DJI Osmo 배터리 소형',model:'카메라 배터리 소형',qty:1,loc:'201호',note:''},
-  {id:'e4',code:'FBAT0002',cat:'배터리',name:'DJI Osmo 배터리 대형',model:'카메라 배터리 대형',qty:1,loc:'201호',note:''},
-  {id:'e5',code:'FBAT0003',cat:'배터리',name:'DJI Osmo 배터리 대형',model:'카메라 배터리 대형',qty:1,loc:'201호',note:''},
-  {id:'e6',code:'FBAT0004',cat:'배터리',name:'DJI Osmo 배터리 대형',model:'카메라 배터리 대형',qty:1,loc:'201호',note:''},
-  {id:'e7',code:'FBAT0005',cat:'배터리',name:'DJI Osmo 배터리 소형',model:'카메라 배터리 소형',qty:1,loc:'201호',note:''},
-  {id:'e8',code:'FSDM0001',cat:'오디오',name:'DJI Osmo 마이크',model:'Osmo 마이크',qty:1,loc:'201호',note:'마이크'},
-  {id:'e9',code:'FSDM0002',cat:'오디오',name:'DJI 마이크',model:'DJI 마이크',qty:1,loc:'201호',note:'구성 마이크 2개'},
-  {id:'e10',code:'FSDM0003',cat:'오디오',name:'DJI MINI 마이크',model:'DJI 미니 마이크',qty:1,loc:'201호',note:'구성 마이크 2개'},
-  {id:'e11',code:'FSDM0004',cat:'오디오',name:'마이크 윈드스크린',model:'마이크 윈드 스크린',qty:5,loc:'201호',note:''},
-  {id:'e12',code:'FSDM0005',cat:'오디오',name:'오디오 케이블',model:'오디오 케이블',qty:1,loc:'201호',note:''},
-  {id:'e13',code:'MSSD01',cat:'하드웨어',name:'SSD 외장하드 1',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e14',code:'MSSD02',cat:'하드웨어',name:'SSD 외장하드 2',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e15',code:'MSSD03',cat:'하드웨어',name:'SSD 외장하드 3',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e16',code:'MSSD04',cat:'하드웨어',name:'SSD 외장하드 4',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e17',code:'MSSD05',cat:'하드웨어',name:'SSD 외장하드 5',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e18',code:'MSSD06',cat:'하드웨어',name:'SSD 외장하드 6',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e19',code:'MSSD07',cat:'하드웨어',name:'SSD 외장하드 7',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e20',code:'MSSD08',cat:'하드웨어',name:'SSD 외장하드 8',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e21',code:'MSSD09',cat:'하드웨어',name:'SSD 외장하드 9',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e22',code:'MSSD10',cat:'하드웨어',name:'SSD 외장하드 10',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e23',code:'MSSD11',cat:'하드웨어',name:'SSD 외장하드 11',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e24',code:'MHDD01',cat:'하드웨어',name:'HDD 외장하드 1',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e25',code:'MHDD02',cat:'하드웨어',name:'HDD 외장하드 2',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e26',code:'MHDD03',cat:'하드웨어',name:'HDD 외장하드 3',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e27',code:'MHDD04',cat:'하드웨어',name:'HDD 외장하드 4',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e28',code:'MHDD05',cat:'하드웨어',name:'HDD 외장하드 5',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e29',code:'MHDD06',cat:'하드웨어',name:'HDD 외장하드 6',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e30',code:'MHDD07',cat:'하드웨어',name:'HDD 외장하드 7',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e31',code:'MHDD08',cat:'하드웨어',name:'HDD 외장하드 8',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e32',code:'MHDD09',cat:'하드웨어',name:'HDD 외장하드 9',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e33',code:'MHDD10',cat:'하드웨어',name:'HDD 외장하드 10',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e34',code:'MHDD11',cat:'하드웨어',name:'HDD 외장하드 11',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e35',code:'MHDD12',cat:'하드웨어',name:'HDD 외장하드 12',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e36',code:'MHDD13',cat:'하드웨어',name:'HDD 외장하드 13',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e37',code:'MHDD14',cat:'하드웨어',name:'HDD 외장하드 14',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e38',code:'MHDD15',cat:'하드웨어',name:'HDD 외장하드 15',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e39',code:'MHDD16',cat:'하드웨어',name:'HDD 외장하드 16',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e40',code:'MHDD17',cat:'하드웨어',name:'HDD 외장하드 17',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e41',code:'MHDD18',cat:'하드웨어',name:'HDD 외장하드 18',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e42',code:'MHDD19',cat:'하드웨어',name:'HDD 외장하드 19',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e43',code:'MHDD20',cat:'하드웨어',name:'HDD 외장하드 20',model:'외장하드',qty:1,loc:'201호',note:''},
-  {id:'e44',code:'FPC0001',cat:'보조배터리',name:'P1 보조배터리 1',model:'P1 보조배터리',qty:1,loc:'201호',note:''},
-  {id:'e45',code:'FPC0002',cat:'보조배터리',name:'P1 보조배터리 2',model:'P1 보조배터리',qty:1,loc:'201호',note:''},
-  {id:'e46',code:'FPC0003',cat:'보조배터리',name:'P1 보조배터리 3',model:'P1 보조배터리',qty:1,loc:'201호',note:''},
-  {id:'e47',code:'MCP0001',cat:'컴퓨터',name:'맥북에어 2023 (양수빈)',model:'APPLE2023',qty:1,loc:'201호',note:''},
-  {id:'e48',code:'MCP0002',cat:'컴퓨터',name:'맥북에어 2024 (김종원)',model:'APPLE2024',qty:1,loc:'201호',note:''},
-  {id:'e49',code:'MCP0002',cat:'컴퓨터',name:'맥북에어 2024 (정재홍)',model:'APPLE2024',qty:1,loc:'201호',note:''},
-  {id:'e50',code:'MCP0003',cat:'컴퓨터',name:'맥북에어 2024 (한상아)',model:'APPLE2024',qty:1,loc:'201호',note:''},
-  {id:'e51',code:'MHUB0001',cat:'허브',name:'Belkin Hub 1',model:'belkin Hub',qty:1,loc:'201호',note:''},
-  {id:'e52',code:'MHUB0002',cat:'허브',name:'Belkin Hub 2',model:'belkin Hub',qty:1,loc:'201호',note:''},
-  {id:'e53',code:'MSDC0001',cat:'SD',name:'SANDISK micro SD 1',model:'SANDISK micro SD',qty:1,loc:'201호',note:''},
-  {id:'e54',code:'MSDC0002',cat:'SD',name:'SANDISK micro SD 2',model:'SANDISK micro SD',qty:1,loc:'201호',note:''},
-  {id:'e55',code:'MSDC0003',cat:'SD',name:'SANDISK micro SD 3',model:'SANDISK micro SD',qty:1,loc:'201호',note:''},
+const DEFAULT_EQ=[
+  {id:'e1',code:'FCMS0001',cat:'카메라 세트',name:'DJI Osmo Pocket 3',model:'카메라 세트',qty:1,note:'삼각대,마이크,소형배터리,윈드스크린'},
+  {id:'e2',code:'FCAM0001',cat:'카메라',name:'DJI Osmo Pocket 3',model:'핸디캠',qty:1,note:'핸드카메라'},
+  {id:'e3',code:'FBAT0001',cat:'배터리',name:'DJI Osmo 배터리 소형 1',model:'카메라 배터리 소형',qty:1,note:''},
+  {id:'e4',code:'FBAT0002',cat:'배터리',name:'DJI Osmo 배터리 대형 1',model:'카메라 배터리 대형',qty:1,note:''},
+  {id:'e5',code:'FBAT0003',cat:'배터리',name:'DJI Osmo 배터리 대형 2',model:'카메라 배터리 대형',qty:1,note:''},
+  {id:'e6',code:'FBAT0004',cat:'배터리',name:'DJI Osmo 배터리 대형 3',model:'카메라 배터리 대형',qty:1,note:''},
+  {id:'e7',code:'FBAT0005',cat:'배터리',name:'DJI Osmo 배터리 소형 2',model:'카메라 배터리 소형',qty:1,note:''},
+  {id:'e8',code:'FSDM0001',cat:'오디오',name:'DJI Osmo 마이크',model:'Osmo 마이크',qty:1,note:'마이크'},
+  {id:'e9',code:'FSDM0002',cat:'오디오',name:'DJI 마이크',model:'DJI 마이크',qty:1,note:'구성 마이크 2개'},
+  {id:'e10',code:'FSDM0003',cat:'오디오',name:'DJI MINI 마이크',model:'DJI 미니 마이크',qty:1,note:'구성 마이크 2개'},
+  {id:'e11',code:'FSDM0004',cat:'오디오',name:'마이크 윈드스크린',model:'마이크 윈드 스크린',qty:5,note:''},
+  {id:'e12',code:'FSDM0005',cat:'오디오',name:'오디오 케이블',model:'오디오 케이블',qty:1,note:''},
+  {id:'e13',code:'MSSD01',cat:'SSD',name:'SSD 외장하드 1',model:'외장하드',qty:1,note:''},
+  {id:'e14',code:'MSSD02',cat:'SSD',name:'SSD 외장하드 2',model:'외장하드',qty:1,note:''},
+  {id:'e15',code:'MSSD03',cat:'SSD',name:'SSD 외장하드 3',model:'외장하드',qty:1,note:''},
+  {id:'e16',code:'MSSD04',cat:'SSD',name:'SSD 외장하드 4',model:'외장하드',qty:1,note:''},
+  {id:'e17',code:'MSSD05',cat:'SSD',name:'SSD 외장하드 5',model:'외장하드',qty:1,note:''},
+  {id:'e18',code:'MSSD06',cat:'SSD',name:'SSD 외장하드 6',model:'외장하드',qty:1,note:''},
+  {id:'e19',code:'MSSD07',cat:'SSD',name:'SSD 외장하드 7',model:'외장하드',qty:1,note:''},
+  {id:'e20',code:'MSSD08',cat:'SSD',name:'SSD 외장하드 8',model:'외장하드',qty:1,note:''},
+  {id:'e21',code:'MSSD09',cat:'SSD',name:'SSD 외장하드 9',model:'외장하드',qty:1,note:''},
+  {id:'e22',code:'MSSD10',cat:'SSD',name:'SSD 외장하드 10',model:'외장하드',qty:1,note:''},
+  {id:'e23',code:'MSSD11',cat:'SSD',name:'SSD 외장하드 11',model:'외장하드',qty:1,note:''},
+  {id:'e24',code:'MHDD01',cat:'HDD',name:'HDD 외장하드 1',model:'외장하드',qty:1,note:''},
+  {id:'e25',code:'MHDD02',cat:'HDD',name:'HDD 외장하드 2',model:'외장하드',qty:1,note:''},
+  {id:'e26',code:'MHDD03',cat:'HDD',name:'HDD 외장하드 3',model:'외장하드',qty:1,note:''},
+  {id:'e27',code:'MHDD04',cat:'HDD',name:'HDD 외장하드 4',model:'외장하드',qty:1,note:''},
+  {id:'e28',code:'MHDD05',cat:'HDD',name:'HDD 외장하드 5',model:'외장하드',qty:1,note:''},
+  {id:'e29',code:'MHDD06',cat:'HDD',name:'HDD 외장하드 6',model:'외장하드',qty:1,note:''},
+  {id:'e30',code:'MHDD07',cat:'HDD',name:'HDD 외장하드 7',model:'외장하드',qty:1,note:''},
+  {id:'e31',code:'MHDD08',cat:'HDD',name:'HDD 외장하드 8',model:'외장하드',qty:1,note:''},
+  {id:'e32',code:'MHDD09',cat:'HDD',name:'HDD 외장하드 9',model:'외장하드',qty:1,note:''},
+  {id:'e33',code:'MHDD10',cat:'HDD',name:'HDD 외장하드 10',model:'외장하드',qty:1,note:''},
+  {id:'e34',code:'MHDD11',cat:'HDD',name:'HDD 외장하드 11',model:'외장하드',qty:1,note:''},
+  {id:'e35',code:'MHDD12',cat:'HDD',name:'HDD 외장하드 12',model:'외장하드',qty:1,note:''},
+  {id:'e36',code:'MHDD13',cat:'HDD',name:'HDD 외장하드 13',model:'외장하드',qty:1,note:''},
+  {id:'e37',code:'MHDD14',cat:'HDD',name:'HDD 외장하드 14',model:'외장하드',qty:1,note:''},
+  {id:'e38',code:'MHDD15',cat:'HDD',name:'HDD 외장하드 15',model:'외장하드',qty:1,note:''},
+  {id:'e39',code:'MHDD16',cat:'HDD',name:'HDD 외장하드 16',model:'외장하드',qty:1,note:''},
+  {id:'e40',code:'MHDD17',cat:'HDD',name:'HDD 외장하드 17',model:'외장하드',qty:1,note:''},
+  {id:'e41',code:'MHDD18',cat:'HDD',name:'HDD 외장하드 18',model:'외장하드',qty:1,note:''},
+  {id:'e42',code:'MHDD19',cat:'HDD',name:'HDD 외장하드 19',model:'외장하드',qty:1,note:''},
+  {id:'e43',code:'MHDD20',cat:'HDD',name:'HDD 외장하드 20',model:'외장하드',qty:1,note:''},
+  {id:'e44',code:'FPC0001',cat:'보조배터리',name:'P1 보조배터리 1',model:'P1 보조배터리',qty:1,note:''},
+  {id:'e45',code:'FPC0002',cat:'보조배터리',name:'P1 보조배터리 2',model:'P1 보조배터리',qty:1,note:''},
+  {id:'e46',code:'FPC0003',cat:'보조배터리',name:'P1 보조배터리 3',model:'P1 보조배터리',qty:1,note:''},
+  {id:'e47',code:'MCP0001',cat:'컴퓨터',name:'맥북에어 2023 (양수빈)',model:'APPLE2023',qty:1,note:''},
+  {id:'e48',code:'MCP0002',cat:'컴퓨터',name:'맥북에어 2024 (김종원)',model:'APPLE2024',qty:1,note:''},
+  {id:'e49',code:'MCP0002',cat:'컴퓨터',name:'맥북에어 2024 (정재홍)',model:'APPLE2024',qty:1,note:''},
+  {id:'e50',code:'MCP0003',cat:'컴퓨터',name:'맥북에어 2024 (한상아)',model:'APPLE2024',qty:1,note:''},
+  {id:'e51',code:'MHUB0001',cat:'허브',name:'Belkin Hub 1',model:'belkin Hub',qty:1,note:''},
+  {id:'e52',code:'MHUB0002',cat:'허브',name:'Belkin Hub 2',model:'belkin Hub',qty:1,note:''},
+  {id:'e53',code:'MSDC0001',cat:'SD',name:'SANDISK micro SD 1',model:'SANDISK micro SD',qty:1,note:''},
+  {id:'e54',code:'MSDC0002',cat:'SD',name:'SANDISK micro SD 2',model:'SANDISK micro SD',qty:1,note:''},
+  {id:'e55',code:'MSDC0003',cat:'SD',name:'SANDISK micro SD 3',model:'SANDISK micro SD',qty:1,note:''},
 ];
 
-let EQ=[], CO=[], tab='status';
+let EQ=[],CO=[],REQUESTS=[],HDD_PROJECTS=[],tab='status',isAdmin=true;
 
 function today(){return new Date().toISOString().split('T')[0];}
 function getEq(id){return EQ.find(e=>e.id===id)||{name:'(삭제된 장비)',cat:'',code:''};}
-function eqStatus(id){const a=CO.filter(c=>c.equipId===id&&c.status!=='returned');return a.length?a[0].status:'in';}
+function eqStatus(id){
+  const approved=CO.filter(c=>c.equipIds&&c.equipIds.includes(id)&&c.status!=='returned');
+  return approved.length?approved[0].status:'in';
+}
 function checkOverdue(){CO.forEach(c=>{if(c.status==='out'&&c.returnDate<today())c.status='overdue';});}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 function lsGet(k,def){try{return JSON.parse(localStorage.getItem(k))||def;}catch{return def;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
 function loadData(){
-  EQ=lsGet('vdot_eq_v3',null);
-  if(!EQ){EQ=[...DEFAULT_EQ];lsSet('vdot_eq_v3',EQ);}
-  CO=lsGet('vdot_co_v3',[]);
+  EQ=lsGet('vdot_eq_v4',null);
+  if(!EQ){EQ=[...DEFAULT_EQ];lsSet('vdot_eq_v4',EQ);}
+  CO=lsGet('vdot_co_v4',[]);
+  REQUESTS=lsGet('vdot_req_v4',[]);
+  HDD_PROJECTS=lsGet('vdot_hdd_v4',[]);
+  isAdmin=lsGet('vdot_role',true);
 }
-function saveEQ(){lsSet('vdot_eq_v3',EQ);}
-function saveCO(){lsSet('vdot_co_v3',CO);}
+function saveAll(){lsSet('vdot_eq_v4',EQ);lsSet('vdot_co_v4',CO);lsSet('vdot_req_v4',REQUESTS);lsSet('vdot_hdd_v4',HDD_PROJECTS);lsSet('vdot_role',isAdmin);}
+
+function toggleRole(){
+  isAdmin=!isAdmin;
+  lsSet('vdot_role',isAdmin);
+  document.getElementById('role-display').textContent=isAdmin?'관리자 모드':'직원 모드';
+  document.getElementById('tab-btn-admin').style.display=isAdmin?'':'none';
+  if(!isAdmin&&tab==='admin')switchTab('status',document.querySelector('.tab'));
+  render();
+}
 
 function renderStats(){
-  const total=EQ.length,out=CO.filter(c=>c.status==='out').length,
-        over=CO.filter(c=>c.status==='overdue').length,
-        ret=CO.filter(c=>c.returnedDate===today()).length;
+  const pending=REQUESTS.filter(r=>r.status==='pending').length;
+  const out=CO.filter(c=>c.status==='out').length;
+  const over=CO.filter(c=>c.status==='overdue').length;
+  const ret=CO.filter(c=>c.returnedDate===today()).length;
+  const total=EQ.length;
   document.getElementById('stats').innerHTML=`
     <div class="stat-card"><div class="stat-label">전체 장비</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">승인 대기</div><div class="stat-value pending">${pending}</div></div>
     <div class="stat-card"><div class="stat-label">반출 중</div><div class="stat-value out">${out}</div></div>
     <div class="stat-card"><div class="stat-label">연체</div><div class="stat-value overdue">${over}</div></div>
     <div class="stat-card"><div class="stat-label">오늘 반납</div><div class="stat-value">${ret}</div></div>`;
+  const dot=document.getElementById('pending-dot');
+  if(dot)dot.style.display=pending>0?'':'none';
 }
 
 function renderStatus(){
@@ -225,75 +301,142 @@ function renderStatus(){
   const el=document.getElementById('tab-status');
   if(!active.length){el.innerHTML='<div class="empty">현재 반출 중인 장비가 없습니다.</div>';return;}
   el.innerHTML=`<div class="table-wrap"><table>
-    <thead><tr><th>코드</th><th>장비</th><th>담당자</th><th>프로젝트</th><th>반출일</th><th>예정 반납일</th><th>상태</th><th></th></tr></thead>
+    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 목록</th><th>반출일</th><th>예정 반납일</th><th>상태</th><th></th></tr></thead>
     <tbody>${active.map(c=>{
-      const eq=getEq(c.equipId);
       const badge=c.status==='overdue'?'<span class="badge badge-overdue">연체</span>':'<span class="badge badge-out">반출 중</span>';
-      return `<tr>
-        <td><span class="code">${eq.code||''}</span></td>
-        <td><strong>${eq.name}</strong><br><span style="font-size:11px;color:#888">${eq.cat}</span></td>
-        <td>${c.person}</td><td>${c.project||'—'}</td>
+      const eqNames=(c.equipIds||[]).map(id=>`<span class="code" style="margin:1px;display:inline-block">${getEq(id).code}</span>`).join(' ');
+      return`<tr>
+        <td><strong>${c.person}</strong></td>
+        <td>${c.project||'—'}</td>
+        <td style="max-width:280px">${eqNames}</td>
         <td>${c.outDate}</td><td>${c.returnDate}</td>
         <td>${badge}</td>
-        <td><button class="btn btn-sm" onclick="returnEquip('${c.id}')">반납</button></td>
+        <td style="display:flex;gap:6px;">
+          ${isAdmin?`<button class="btn btn-sm btn-pdf" onclick="showPdf('${c.id}')">PDF</button><button class="btn btn-sm btn-success" onclick="returnAll('${c.id}')">반납</button>`:''}
+        </td>
       </tr>`;
     }).join('')}</tbody></table></div>`;
 }
 
+function renderAdmin(){
+  const el=document.getElementById('tab-admin');
+  const pending=REQUESTS.filter(r=>r.status==='pending');
+  const done=REQUESTS.filter(r=>r.status!=='pending').slice(0,20);
+  let html=`<div class="section-header"><span class="section-title">승인 대기 ${pending.length}건</span></div>`;
+  if(!pending.length){html+='<div class="empty" style="margin-bottom:1.5rem">대기 중인 신청이 없습니다.</div>';}
+  else{
+    html+=`<div class="table-wrap" style="margin-bottom:1.5rem"><table>
+      <thead><tr><th>신청일시</th><th>신청자</th><th>프로젝트</th><th>장비</th><th>반출일</th><th>반납일</th><th>메모</th><th></th></tr></thead>
+      <tbody>${pending.map(r=>{
+        const eqList=(r.equipIds||[]).map(id=>{const eq=getEq(id);return`<div style="font-size:12px"><span class="code">${eq.code}</span> ${eq.name}</div>`;}).join('');
+        return`<tr>
+          <td style="font-size:11px;color:#888">${r.createdAt||''}</td>
+          <td><strong>${r.person}</strong></td>
+          <td>${r.project||'—'}</td>
+          <td style="max-width:220px">${eqList}</td>
+          <td>${r.outDate}</td><td>${r.returnDate}</td>
+          <td style="font-size:12px;color:#888">${r.note||'—'}</td>
+          <td style="display:flex;gap:6px;">
+            <button class="btn btn-sm btn-success" onclick="approveRequest('${r.id}')">승인</button>
+            <button class="btn btn-sm btn-danger" onclick="rejectRequest('${r.id}')">반려</button>
+          </td>
+        </tr>`;
+      }).join('')}</tbody></table></div>`;
+  }
+  html+=`<div class="section-header"><span class="section-title">처리 완료</span></div>`;
+  if(!done.length){html+='<div class="empty">처리된 신청이 없습니다.</div>';}
+  else{
+    html+=`<div class="table-wrap"><table>
+      <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 수</th><th>반출일</th><th>결과</th></tr></thead>
+      <tbody>${done.map(r=>`<tr>
+        <td>${r.person}</td><td>${r.project||'—'}</td>
+        <td>${(r.equipIds||[]).length}개</td><td>${r.outDate}</td>
+        <td>${r.status==='approved'?'<span class="badge badge-in">승인</span>':'<span class="badge badge-rejected">반려</span>'}</td>
+      </tr>`).join('')}</tbody></table></div>`;
+  }
+  el.innerHTML=html;
+}
+
 function renderEquipment(){
   const cats=[...new Set(EQ.map(e=>e.cat))];
-  const catFilter=document.getElementById('eq-cat-filter')?document.getElementById('eq-cat-filter').value:'전체';
-  const search=document.getElementById('eq-search')?document.getElementById('eq-search').value.toLowerCase():'';
+  const catFilter=document.getElementById('eq-cat-filter2')?document.getElementById('eq-cat-filter2').value:'전체';
+  const search=document.getElementById('eq-search2')?document.getElementById('eq-search2').value.toLowerCase():'';
   const filtered=EQ.filter(e=>{
-    const matchCat=catFilter==='전체'||e.cat===catFilter;
-    const matchSearch=!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search);
-    return matchCat&&matchSearch;
+    return(catFilter==='전체'||e.cat===catFilter)&&(!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search));
   });
   const el=document.getElementById('tab-equipment');
   el.innerHTML=`
-    <div class="section-header">
-      <span class="section-title">총 ${EQ.length}개 장비</span>
-      <button class="btn btn-sm" onclick="openEquip()">+ 장비 추가</button>
-    </div>
     <div class="filter-bar">
-      <select id="eq-cat-filter" onchange="renderEquipment()">
+      <select id="eq-cat-filter2" onchange="renderEquipment()">
         <option>전체</option>${cats.map(c=>`<option${catFilter===c?' selected':''}>${c}</option>`).join('')}
       </select>
-      <input type="text" id="eq-search" placeholder="장비명 또는 코드 검색" value="${search}" oninput="renderEquipment()">
+      <input type="text" id="eq-search2" placeholder="장비명 또는 코드 검색" value="${search}" oninput="renderEquipment()">
     </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>코드</th><th>장비명</th><th>카테고리</th><th>수량</th><th>위치</th><th>상태</th><th></th></tr></thead>
-      <tbody>${filtered.length===0?`<tr><td colspan="7"><div class="empty">해당하는 장비가 없습니다.</div></td></tr>`:filtered.map(e=>{
+      <thead><tr><th>코드</th><th>장비명</th><th>카테고리</th><th>수량</th><th>비고</th><th>상태</th></tr></thead>
+      <tbody>${filtered.map(e=>{
         const st=eqStatus(e.id);
         const badge=st==='overdue'?'<span class="badge badge-overdue">연체</span>':st==='out'?'<span class="badge badge-out">반출 중</span>':'<span class="badge badge-in">보유 중</span>';
-        return `<tr>
+        return`<tr>
           <td><span class="code">${e.code}</span></td>
           <td><strong>${e.name}</strong>${e.note?`<br><span style="font-size:11px;color:#aaa">${e.note}</span>`:''}
           </td>
           <td><span class="cat-badge">${e.cat}</span></td>
           <td>${e.qty}</td>
-          <td style="color:#888;font-size:12px">${e.loc||'—'}</td>
+          <td style="font-size:12px;color:#aaa">${e.note||'—'}</td>
           <td>${badge}</td>
-          <td><button class="btn btn-sm btn-danger" onclick="deleteEquip('${e.id}')">삭제</button></td>
         </tr>`;
       }).join('')}</tbody>
     </table></div>`;
 }
 
+function renderHdd(){
+  const el=document.getElementById('tab-hdd');
+  const hddEqs=EQ.filter(e=>e.cat==='SSD'||e.cat==='HDD');
+  const usedIds=HDD_PROJECTS.flatMap(p=>p.equipIds||[]);
+  const unusedHdds=hddEqs.filter(e=>!usedIds.includes(e.id));
+  let html=`<div class="section-header">
+    <span class="section-title">프로젝트별 외장하드 현황</span>
+    ${isAdmin?`<button class="btn btn-sm btn-primary" onclick="openHdd()">+ 프로젝트 연결</button>`:''}
+  </div>`;
+  if(HDD_PROJECTS.length){
+    html+=HDD_PROJECTS.map(p=>{
+      const eqs=(p.equipIds||[]).map(id=>getEq(id));
+      return`<div class="hdd-card">
+        <div class="hdd-project">
+          <span>${p.project}</span>
+          ${isAdmin?`<button class="btn btn-sm btn-danger" onclick="deleteHddProject('${p.id}')">삭제</button>`:''}
+        </div>
+        <div class="hdd-list">${eqs.map(e=>`<span class="hdd-chip"><span style="font-family:monospace;font-size:11px">${e.code}</span> ${e.name}</span>`).join('')}</div>
+      </div>`;
+    }).join('');
+  }else{html+='<div class="empty" style="margin-bottom:1rem">연결된 프로젝트가 없습니다.</div>';}
+  html+=`<div class="section-header" style="margin-top:1.5rem"><span class="section-title">미배정 외장하드 (${unusedHdds.length}개)</span></div>`;
+  if(unusedHdds.length){
+    html+=`<div class="table-wrap"><table>
+      <thead><tr><th>코드</th><th>장비명</th><th>종류</th><th>상태</th></tr></thead>
+      <tbody>${unusedHdds.map(e=>{
+        const st=eqStatus(e.id);
+        const badge=st==='out'?'<span class="badge badge-out">반출 중</span>':'<span class="badge badge-in">보유 중</span>';
+        return`<tr><td><span class="code">${e.code}</span></td><td>${e.name}</td><td><span class="cat-badge">${e.cat}</span></td><td>${badge}</td></tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+  }else{html+='<div class="empty">모든 외장하드가 프로젝트에 배정되어 있습니다.</div>';}
+  el.innerHTML=html;
+}
+
 function renderHistory(){
   const el=document.getElementById('tab-history');
-  const sorted=[...CO].sort((a,b)=>(b.outDate||'').localeCompare(a.outDate||''));
+  const returned=CO.filter(c=>c.status==='returned').sort((a,b)=>(b.returnedDate||'').localeCompare(a.returnedDate||''));
   el.innerHTML=`<div class="table-wrap"><table>
-    <thead><tr><th>코드</th><th>장비</th><th>담당자</th><th>프로젝트</th><th>반출일</th><th>반납일</th><th>메모</th><th>상태</th></tr></thead>
-    <tbody>${sorted.length===0?`<tr><td colspan="8"><div class="empty">반출 이력이 없습니다.</div></td></tr>`:sorted.map(c=>{
-      const eq=getEq(c.equipId);
-      const badge=c.status==='returned'?'<span class="badge badge-in">반납 완료</span>':c.status==='overdue'?'<span class="badge badge-overdue">연체</span>':'<span class="badge badge-out">반출 중</span>';
-      return `<tr>
-        <td><span class="code">${eq.code||''}</span></td>
-        <td>${eq.name}</td><td>${c.person}</td><td>${c.project||'—'}</td>
-        <td>${c.outDate}</td><td>${c.returnedDate||c.returnDate}</td>
+    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비</th><th>반출일</th><th>반납일</th><th>메모</th></tr></thead>
+    <tbody>${returned.length===0?`<tr><td colspan="6"><div class="empty">반납 완료된 이력이 없습니다.</div></td></tr>`:returned.map(c=>{
+      const eqNames=(c.equipIds||[]).map(id=>`<span class="code" style="margin:1px;display:inline-block">${getEq(id).code}</span>`).join(' ');
+      return`<tr>
+        <td>${c.person}</td><td>${c.project||'—'}</td>
+        <td style="max-width:260px">${eqNames}</td>
+        <td>${c.outDate}</td><td>${c.returnedDate||'—'}</td>
         <td style="font-size:12px;color:#888">${c.note||'—'}</td>
-        <td>${badge}</td>
       </tr>`;
     }).join('')}</tbody>
   </table></div>`;
@@ -301,8 +444,12 @@ function renderHistory(){
 
 function render(){
   checkOverdue();renderStats();
+  document.getElementById('role-display').textContent=isAdmin?'관리자 모드':'직원 모드';
+  document.getElementById('tab-btn-admin').style.display=isAdmin?'':'none';
   if(tab==='status')renderStatus();
+  else if(tab==='admin')renderAdmin();
   else if(tab==='equipment')renderEquipment();
+  else if(tab==='hdd')renderHdd();
   else renderHistory();
 }
 
@@ -310,67 +457,151 @@ function switchTab(t,el){
   tab=t;
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   el.classList.add('active');
-  ['status','equipment','history'].forEach(x=>{document.getElementById('tab-'+x).style.display=x===t?'':'none';});
+  ['status','admin','equipment','hdd','history'].forEach(x=>{document.getElementById('tab-'+x).style.display=x===t?'':'none';});
   render();
 }
 
-function openCheckout(){
-  const avail=EQ.filter(e=>eqStatus(e.id)==='in');
-  if(!avail.length){alert('현재 반출 가능한 장비가 없습니다.');return;}
-  document.getElementById('co-eq').innerHTML=avail.map(e=>`<option value="${e.id}">[${e.code}] ${e.name}</option>`).join('');
-  document.getElementById('co-out').value=today();
-  document.getElementById('co-ret').value='';
-  document.getElementById('co-person').value='';
-  document.getElementById('co-proj').value='';
-  document.getElementById('co-note').value='';
-  document.getElementById('modal-checkout').classList.add('open');
+function openRequest(){
+  document.getElementById('req-person').value='';
+  document.getElementById('req-project').value='';
+  document.getElementById('req-out').value=today();
+  document.getElementById('req-ret').value='';
+  document.getElementById('req-note').value='';
+  const cats=[...new Set(EQ.map(e=>e.cat))];
+  const catSel=document.getElementById('req-cat-filter');
+  catSel.innerHTML='<option value="">전체</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  buildReqList('','');
+  document.getElementById('modal-request').classList.add('open');
 }
+
+function buildReqList(search,cat){
+  const list=document.getElementById('req-eq-list');
+  const filtered=EQ.filter(e=>{
+    return(!cat||e.cat===cat)&&(!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search));
+  });
+  list.innerHTML=filtered.map(e=>{
+    const st=eqStatus(e.id);
+    const isOut=st!=='in';
+    const checked=document.querySelector(`input[data-eq="${e.id}"]`)?.checked?'checked':'';
+    return`<label class="eq-check-item${isOut?' disabled':''}">
+      <input type="checkbox" data-eq="${e.id}" ${isOut?'disabled':''} ${checked} onchange="updateReqSummary()">
+      <div class="eq-check-info">
+        <div class="eq-check-name"><span class="code">${e.code}</span> ${e.name}</div>
+        <div class="eq-check-sub">${e.cat}${e.note?' · '+e.note:''}</div>
+      </div>
+      <div class="eq-check-status">${isOut?`<span class="badge badge-out">반출 중</span>`:''}</div>
+    </label>`;
+  }).join('');
+  updateReqSummary();
+}
+
+function filterReqList(){
+  const search=document.getElementById('req-search').value.toLowerCase();
+  const cat=document.getElementById('req-cat-filter').value;
+  buildReqList(search,cat);
+}
+
+function updateReqSummary(){
+  const checked=[...document.querySelectorAll('#req-eq-list input[type=checkbox]:checked')];
+  const el=document.getElementById('req-selected-summary');
+  el.textContent=checked.length?`${checked.length}개 장비 선택됨`:'';
+}
+
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
-function submitCheckout(){
-  const equipId=document.getElementById('co-eq').value;
-  const person=document.getElementById('co-person').value.trim();
-  const project=document.getElementById('co-proj').value.trim();
-  const outDate=document.getElementById('co-out').value;
-  const returnDate=document.getElementById('co-ret').value;
-  if(!person||!outDate||!returnDate){alert('담당자, 반출일, 예정 반납일을 입력해주세요.');return;}
-  CO.push({id:'c'+Date.now(),equipId,person,project,outDate,returnDate,
-    status:returnDate<today()?'overdue':'out',returnedDate:'',
-    note:document.getElementById('co-note').value.trim()});
-  saveCO();showToast('반출 등록 완료');closeModal('modal-checkout');render();
+function submitRequest(){
+  const person=document.getElementById('req-person').value.trim();
+  const project=document.getElementById('req-project').value.trim();
+  const outDate=document.getElementById('req-out').value;
+  const returnDate=document.getElementById('req-ret').value;
+  const equipIds=[...document.querySelectorAll('#req-eq-list input[type=checkbox]:checked')].map(i=>i.dataset.eq);
+  if(!person||!outDate||!returnDate){alert('신청자, 반출일, 예정 반납일을 입력해주세요.');return;}
+  if(!equipIds.length){alert('장비를 1개 이상 선택해주세요.');return;}
+  const now=new Date();
+  const createdAt=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  REQUESTS.unshift({id:'r'+Date.now(),person,project,outDate,returnDate,equipIds,note:document.getElementById('req-note').value.trim(),status:'pending',createdAt});
+  saveAll();showToast('반출 신청 완료! 관리자 승인을 기다려주세요.');closeModal('modal-request');render();
 }
 
-function returnEquip(id){
+function approveRequest(id){
+  const r=REQUESTS.find(x=>x.id===id);
+  if(!r)return;
+  r.status='approved';
+  CO.unshift({id:'c'+Date.now(),person:r.person,project:r.project,equipIds:r.equipIds,outDate:r.outDate,returnDate:r.returnDate,note:r.note,status:r.returnDate<today()?'overdue':'out',returnedDate:''});
+  saveAll();showToast('승인 완료');render();
+}
+
+function rejectRequest(id){
+  const r=REQUESTS.find(x=>x.id===id);
+  if(!r||!confirm('신청을 반려하시겠습니까?'))return;
+  r.status='rejected';
+  saveAll();showToast('반려 처리됨');render();
+}
+
+function returnAll(id){
   const c=CO.find(x=>x.id===id);
-  if(!c||!confirm(`${getEq(c.equipId).name} 반납 처리하시겠습니까?`))return;
+  if(!c||!confirm('해당 반출건을 반납 처리하시겠습니까?'))return;
   c.status='returned';c.returnedDate=today();
-  saveCO();showToast('반납 처리 완료');render();
+  saveAll();showToast('반납 처리 완료');render();
 }
 
-function openEquip(){
-  ['eq-code','eq-name','eq-model','eq-loc','eq-note'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('eq-qty').value=1;
-  document.getElementById('modal-equip').classList.add('open');
+function showPdf(id){
+  const c=CO.find(x=>x.id===id);
+  if(!c)return;
+  const eqs=(c.equipIds||[]).map(id=>getEq(id));
+  const rows=eqs.map((e,i)=>`<tr><td>${i+1}</td><td>${e.code}</td><td>${e.cat}</td><td>${e.name}</td><td>1</td><td></td></tr>`).join('');
+  document.getElementById('pdf-content').innerHTML=`
+    <h2>(주)브이닷 장비 반출 신청서</h2>
+    <div class="meta">
+      <div class="meta-item"><span class="meta-label">신청자</span><strong>${c.person}</strong></div>
+      <div class="meta-item"><span class="meta-label">프로젝트</span><strong>${c.project||'—'}</strong></div>
+      <div class="meta-item"><span class="meta-label">반출일</span><strong>${c.outDate}</strong></div>
+      <div class="meta-item"><span class="meta-label">예정 반납일</span><strong>${c.returnDate}</strong></div>
+      ${c.note?`<div class="meta-item" style="grid-column:span 2"><span class="meta-label">메모</span>${c.note}</div>`:''}
+    </div>
+    <table>
+      <thead><tr><th>NO</th><th>코드</th><th>분류</th><th>장비명</th><th>수량</th><th>확인</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="sign-area">
+      <div class="sign-box"><div class="sign-label">신청자</div><div class="sign-name">${c.person}</div></div>
+      <div class="sign-box"><div class="sign-label">승인자</div><div class="sign-name">이상협</div></div>
+      <div class="sign-box"><div class="sign-label">반납 확인</div><div class="sign-name"></div></div>
+    </div>`;
+  document.getElementById('modal-pdf').classList.add('open');
 }
 
-function submitEquip(){
-  const name=document.getElementById('eq-name').value.trim();
-  if(!name){alert('장비명을 입력해주세요.');return;}
-  EQ.push({id:'e'+Date.now(),
-    code:document.getElementById('eq-code').value.trim(),
-    cat:document.getElementById('eq-cat').value,
-    name,model:document.getElementById('eq-model').value.trim(),
-    qty:parseInt(document.getElementById('eq-qty').value)||1,
-    loc:document.getElementById('eq-loc').value.trim(),
-    note:document.getElementById('eq-note').value.trim()});
-  saveEQ();showToast('장비 추가 완료');closeModal('modal-equip');render();
+function openHdd(){
+  document.getElementById('hdd-project').value='';
+  const hddEqs=EQ.filter(e=>e.cat==='SSD'||e.cat==='HDD');
+  const usedIds=HDD_PROJECTS.flatMap(p=>p.equipIds||[]);
+  document.getElementById('hdd-eq-list').innerHTML=hddEqs.map(e=>{
+    const used=usedIds.includes(e.id);
+    return`<label class="eq-check-item${used?' disabled':''}">
+      <input type="checkbox" data-eq="${e.id}" ${used?'disabled':''}>
+      <div class="eq-check-info">
+        <div class="eq-check-name"><span class="code">${e.code}</span> ${e.name}</div>
+        <div class="eq-check-sub">${e.cat}</div>
+      </div>
+      ${used?'<span style="font-size:11px;color:#aaa">배정됨</span>':''}
+    </label>`;
+  }).join('');
+  document.getElementById('modal-hdd').classList.add('open');
 }
 
-function deleteEquip(id){
-  const eq=getEq(id);
-  if(!confirm(`"${eq.name}" 장비를 삭제하시겠습니까?`))return;
-  EQ=EQ.filter(e=>e.id!==id);
-  saveEQ();showToast('장비 삭제 완료');render();
+function submitHdd(){
+  const project=document.getElementById('hdd-project').value.trim();
+  if(!project){alert('프로젝트명을 입력해주세요.');return;}
+  const equipIds=[...document.querySelectorAll('#hdd-eq-list input[type=checkbox]:checked')].map(i=>i.dataset.eq);
+  if(!equipIds.length){alert('외장하드를 1개 이상 선택해주세요.');return;}
+  HDD_PROJECTS.push({id:'h'+Date.now(),project,equipIds});
+  saveAll();showToast('프로젝트 연결 완료');closeModal('modal-hdd');render();
+}
+
+function deleteHddProject(id){
+  if(!confirm('이 프로젝트 연결을 삭제하시겠습니까?'))return;
+  HDD_PROJECTS=HDD_PROJECTS.filter(p=>p.id!==id);
+  saveAll();showToast('삭제 완료');render();
 }
 
 loadData();render();
