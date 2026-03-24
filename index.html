@@ -11,8 +11,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
 .brand{font-size:12px;font-weight:600;color:#888;letter-spacing:.1em;}
 .title{font-size:22px;font-weight:600;}
-.header-right{display:flex;align-items:center;gap:12px;}
-.role-badge{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;background:#1a1a1a;color:#fff;cursor:pointer;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.role-badge{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;background:#1a1a1a;color:#fff;cursor:pointer;border:none;font-family:inherit;}
 .stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:2rem;}
 .stat-card{background:#fff;border-radius:10px;padding:14px 18px;border:1px solid #e8e8e8;}
 .stat-label{font-size:11px;color:#888;margin-bottom:5px;font-weight:500;}
@@ -21,7 +21,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stat-value.out{color:#1a6fb8;}
 .stat-value.overdue{color:#c0392b;}
 .tab-bar{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:1px solid #e0e0e0;overflow-x:auto;}
-.tab{padding:10px 18px;font-size:13px;cursor:pointer;border:none;background:none;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;white-space:nowrap;}
+.tab{padding:10px 16px;font-size:13px;cursor:pointer;border:none;background:none;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;white-space:nowrap;}
 .tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a;font-weight:600;}
 .tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#e67e22;margin-left:5px;vertical-align:middle;}
 .btn{padding:8px 16px;font-size:13px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#1a1a1a;cursor:pointer;font-family:inherit;font-weight:500;}
@@ -32,8 +32,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-success:hover{background:#219a52;}
 .btn-danger{border-color:#e0b0b0;color:#c0392b;}
 .btn-danger:hover{background:#fff0f0;}
-.btn-warning{background:#e67e22;color:#fff;border-color:#e67e22;}
-.btn-warning:hover{background:#d35400;}
 .btn-pdf{background:#8e44ad;color:#fff;border-color:#8e44ad;}
 .btn-pdf:hover{background:#7d3c98;}
 .btn-sm{padding:5px 11px;font-size:12px;}
@@ -54,37 +52,47 @@ tr:hover td{background:#fafafa;}
 .badge-overdue{background:#ffebee;color:#c62828;}
 .badge-pending{background:#fff3e0;color:#e65100;}
 .badge-rejected{background:#f5f5f5;color:#888;}
+.badge-done{background:#f3e5f5;color:#6a1b9a;}
+.badge-backup{background:#e8f5e9;color:#2e7d32;}
 .cat-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;background:#f0f0f0;color:#555;}
-.code{font-family:monospace;font-size:12px;color:#666;background:#f5f5f5;padding:2px 6px;border-radius:4px;}
+/* 장비 코드/이름 색상 구분 */
+.eq-code{font-family:monospace;font-size:12px;color:#1565c0;background:#e3f2fd;padding:2px 7px;border-radius:4px;font-weight:600;}
+.eq-name{font-size:13px;color:#2e7d32;font-weight:500;}
 .empty{text-align:center;padding:2.5rem;color:#aaa;font-size:14px;}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:flex-start;justify-content:center;padding-top:3vh;overflow-y:auto;}
 .modal-overlay.open{display:flex;}
-.modal{background:#fff;border-radius:14px;padding:1.75rem;width:640px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.15);max-height:90vh;overflow-y:auto;}
+.modal{background:#fff;border-radius:14px;padding:1.75rem;width:660px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.15);margin-bottom:3vh;}
 .modal-title{font-size:17px;font-weight:600;margin-bottom:1.25rem;}
 .form-row{margin-bottom:14px;}
 .form-label{font-size:12px;color:#888;margin-bottom:5px;display:block;font-weight:500;}
 input[type=text],input[type=date],input[type=number],select,textarea{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;background:#fff;color:#1a1a1a;outline:none;}
 input:focus,select:focus,textarea:focus{border-color:#1a1a1a;}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:1.5rem;}
-.eq-checklist{max-height:320px;overflow-y:auto;border:1px solid #e8e8e8;border-radius:8px;}
-.eq-check-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:1.5rem;position:sticky;bottom:0;background:#fff;padding-top:12px;border-top:1px solid #f0f0f0;}
+.eq-checklist{max-height:300px;overflow-y:auto;border:1px solid #e8e8e8;border-radius:8px;}
+.eq-check-item{display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;}
 .eq-check-item:last-child{border-bottom:none;}
 .eq-check-item:hover{background:#fafafa;}
-.eq-check-item.disabled{opacity:.45;cursor:not-allowed;}
-.eq-check-item input[type=checkbox]{width:16px;height:16px;flex-shrink:0;cursor:pointer;}
+.eq-check-item.disabled{opacity:.45;cursor:not-allowed;background:#fafafa;}
+.eq-check-item input[type=checkbox]{width:16px;height:16px;flex-shrink:0;cursor:pointer;accent-color:#1a1a1a;}
 .eq-check-item.disabled input[type=checkbox]{cursor:not-allowed;}
 .eq-check-info{flex:1;}
-.eq-check-name{font-size:13px;font-weight:500;}
+.eq-check-name{font-size:13px;}
 .eq-check-sub{font-size:11px;color:#888;margin-top:2px;}
-.eq-check-status{font-size:11px;}
+/* 신청 목록 내 장비 표시 */
+.req-eq-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
 .hdd-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:1rem 1.25rem;margin-bottom:12px;}
 .hdd-project{font-size:14px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
 .hdd-list{display:flex;flex-wrap:wrap;gap:6px;}
 .hdd-chip{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;background:#e3f2fd;color:#1565c0;border:1px solid #bbdefb;}
-.hdd-chip.available{background:#e8f5e9;color:#2e7d32;border-color:#c8e6c9;}
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+/* 백업 현황 */
+.backup-table select{width:auto;padding:5px 8px;font-size:12px;}
+.backup-status-done{color:#27ae60;font-weight:600;}
+.backup-status-partial{color:#e67e22;font-weight:600;}
+.backup-status-none{color:#c0392b;font-weight:600;}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:8px;font-size:13px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;}
+/* PDF */
 .pdf-preview{background:#fff;border:1px solid #ddd;border-radius:8px;padding:2rem;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;}
 .pdf-preview h2{text-align:center;font-size:18px;margin-bottom:1rem;border-bottom:2px solid #1a1a1a;padding-bottom:.5rem;}
 .pdf-preview .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;font-size:13px;}
@@ -97,8 +105,15 @@ input:focus,select:focus,textarea:focus{border-color:#1a1a1a;}
 .pdf-preview .sign-box{border:1px solid #ddd;border-radius:6px;padding:12px;text-align:center;}
 .pdf-preview .sign-label{font-size:11px;color:#888;margin-bottom:20px;}
 .pdf-preview .sign-name{font-size:13px;font-weight:600;}
-@media print{body{background:#fff;}.app{padding:0;}.tab-bar,.header,.stats-grid,.modal-footer{display:none;}.modal-overlay{position:static;background:none;display:block;}.modal{box-shadow:none;max-height:none;width:100%;padding:0;}}
-@media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}}
+@media print{
+  body{background:#fff;}
+  .app,.tab-bar,.stats-grid,.header{display:none !important;}
+  .modal-overlay{position:static !important;background:none !important;display:block !important;padding:0;}
+  .modal{box-shadow:none !important;max-height:none !important;width:100% !important;padding:0 !important;border-radius:0 !important;}
+  .modal-footer,.modal-title{display:none !important;}
+  #modal-pdf{display:block !important;}
+}
+@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -109,7 +124,7 @@ input:focus,select:focus,textarea:focus{border-color:#1a1a1a;}
       <div class="title">장비 관리</div>
     </div>
     <div class="header-right">
-      <div id="role-display" class="role-badge" onclick="toggleRole()">관리자 모드</div>
+      <button class="role-badge" onclick="toggleRole()" id="role-display">관리자 모드</button>
       <button class="btn btn-primary" onclick="openRequest()">+ 반출 신청</button>
     </div>
   </div>
@@ -119,12 +134,14 @@ input:focus,select:focus,textarea:focus{border-color:#1a1a1a;}
     <button class="tab" id="tab-btn-admin" onclick="switchTab('admin',this)">신청 관리 <span class="dot" id="pending-dot" style="display:none"></span></button>
     <button class="tab" onclick="switchTab('equipment',this)">장비 목록</button>
     <button class="tab" onclick="switchTab('hdd',this)">외장하드</button>
+    <button class="tab" onclick="switchTab('backup',this)">백업 현황</button>
     <button class="tab" onclick="switchTab('history',this)">반출 이력</button>
   </div>
   <div id="tab-status"></div>
   <div id="tab-admin" style="display:none"></div>
   <div id="tab-equipment" style="display:none"></div>
   <div id="tab-hdd" style="display:none"></div>
+  <div id="tab-backup" style="display:none"></div>
   <div id="tab-history" style="display:none"></div>
 </div>
 
@@ -142,16 +159,14 @@ input:focus,select:focus,textarea:focus{border-color:#1a1a1a;}
     </div>
     <div class="form-row"><label class="form-label">메모</label><input type="text" id="req-note" placeholder="(선택)"></div>
     <div class="form-row">
-      <label class="form-label">장비 선택 <span style="color:#888;font-weight:400">(반출 중인 장비는 표시만 됩니다)</span></label>
+      <label class="form-label">장비 선택 <span style="color:#aaa;font-weight:400">(반출 중 장비도 확인 가능, 선택 불가)</span></label>
       <div style="display:flex;gap:8px;margin-bottom:8px;">
         <input type="text" id="req-search" placeholder="장비명 또는 코드 검색" oninput="filterReqList()" style="flex:1;">
-        <select id="req-cat-filter" onchange="filterReqList()" style="width:auto;">
-          <option value="">전체</option>
-        </select>
+        <select id="req-cat-filter" onchange="filterReqList()" style="width:auto;min-width:100px;"></select>
       </div>
       <div class="eq-checklist" id="req-eq-list"></div>
     </div>
-    <div id="req-selected-summary" style="font-size:12px;color:#1a6fb8;margin-top:6px;"></div>
+    <div id="req-selected-summary" style="font-size:12px;color:#1565c0;margin-top:6px;min-height:18px;"></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-request')">취소</button>
       <button class="btn btn-primary" onclick="submitRequest()">신청</button>
@@ -161,8 +176,8 @@ input:focus,select:focus,textarea:focus{border-color:#1a1a1a;}
 
 <!-- PDF 미리보기 모달 -->
 <div class="modal-overlay" id="modal-pdf">
-  <div class="modal" style="width:720px;">
-    <div class="modal-title">반출 신청서</div>
+  <div class="modal" style="width:740px;">
+    <div class="modal-title">반출 신청서 미리보기</div>
     <div class="pdf-preview" id="pdf-content"></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-pdf')">닫기</button>
@@ -183,6 +198,25 @@ input:focus,select:focus,textarea:focus{border-color:#1a1a1a;}
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-hdd')">취소</button>
       <button class="btn btn-primary" onclick="submitHdd()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 승인자 설정 모달 -->
+<div class="modal-overlay" id="modal-approver">
+  <div class="modal" style="width:400px;">
+    <div class="modal-title">승인자 설정</div>
+    <div class="form-row">
+      <label class="form-label">승인자 선택</label>
+      <select id="approver-select">
+        <option value="김종원">김종원</option>
+        <option value="양수빈">양수빈</option>
+        <option value="이상협">이상협</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-approver')">취소</button>
+      <button class="btn btn-primary" onclick="saveApprover()">저장</button>
     </div>
   </div>
 </div>
@@ -248,36 +282,39 @@ const DEFAULT_EQ=[
   {id:'e55',code:'MSDC0003',cat:'SD',name:'SANDISK micro SD 3',model:'SANDISK micro SD',qty:1,note:''},
 ];
 
-let EQ=[],CO=[],REQUESTS=[],HDD_PROJECTS=[],tab='status',isAdmin=true;
+let EQ=[],CO=[],REQUESTS=[],HDD_PROJECTS=[],BACKUPS=[],tab='status',isAdmin=true,approver='김종원';
+const TABS=['status','admin','equipment','hdd','backup','history'];
 
 function today(){return new Date().toISOString().split('T')[0];}
-function getEq(id){return EQ.find(e=>e.id===id)||{name:'(삭제된 장비)',cat:'',code:''};}
-function eqStatus(id){
-  const approved=CO.filter(c=>c.equipIds&&c.equipIds.includes(id)&&c.status!=='returned');
-  return approved.length?approved[0].status:'in';
-}
+function getEq(id){return EQ.find(e=>e.id===id)||{name:'(삭제된 장비)',cat:'',code:'—'};}
+function eqStatus(id){const a=CO.filter(c=>c.equipIds&&c.equipIds.includes(id)&&c.status!=='returned');return a.length?a[0].status:'in';}
 function checkOverdue(){CO.forEach(c=>{if(c.status==='out'&&c.returnDate<today())c.status='overdue';});}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-function lsGet(k,def){try{return JSON.parse(localStorage.getItem(k))||def;}catch{return def;}}
+function lsGet(k,def){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):def;}catch{return def;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
 function loadData(){
-  EQ=lsGet('vdot_eq_v4',null);
-  if(!EQ){EQ=[...DEFAULT_EQ];lsSet('vdot_eq_v4',EQ);}
-  CO=lsGet('vdot_co_v4',[]);
-  REQUESTS=lsGet('vdot_req_v4',[]);
-  HDD_PROJECTS=lsGet('vdot_hdd_v4',[]);
-  isAdmin=lsGet('vdot_role',true);
+  EQ=lsGet('vdot_eq_v5',null);
+  if(!EQ){EQ=[...DEFAULT_EQ];lsSet('vdot_eq_v5',EQ);}
+  CO=lsGet('vdot_co_v5',[]);
+  REQUESTS=lsGet('vdot_req_v5',[]);
+  HDD_PROJECTS=lsGet('vdot_hdd_v5',[]);
+  BACKUPS=lsGet('vdot_backup_v5',[]);
+  isAdmin=lsGet('vdot_role_v5',true);
+  approver=lsGet('vdot_approver_v5','김종원');
 }
-function saveAll(){lsSet('vdot_eq_v4',EQ);lsSet('vdot_co_v4',CO);lsSet('vdot_req_v4',REQUESTS);lsSet('vdot_hdd_v4',HDD_PROJECTS);lsSet('vdot_role',isAdmin);}
+function saveAll(){
+  lsSet('vdot_eq_v5',EQ);lsSet('vdot_co_v5',CO);lsSet('vdot_req_v5',REQUESTS);
+  lsSet('vdot_hdd_v5',HDD_PROJECTS);lsSet('vdot_backup_v5',BACKUPS);
+  lsSet('vdot_role_v5',isAdmin);lsSet('vdot_approver_v5',approver);
+}
 
-function toggleRole(){
-  isAdmin=!isAdmin;
-  lsSet('vdot_role',isAdmin);
-  document.getElementById('role-display').textContent=isAdmin?'관리자 모드':'직원 모드';
-  document.getElementById('tab-btn-admin').style.display=isAdmin?'':'none';
-  if(!isAdmin&&tab==='admin')switchTab('status',document.querySelector('.tab'));
-  render();
+function toggleRole(){isAdmin=!isAdmin;saveAll();render();}
+
+// 장비 코드/이름 컬러 표시 헬퍼
+function eqTag(id){
+  const eq=getEq(id);
+  return`<span class="eq-code">${eq.code}</span> <span class="eq-name">${eq.name}</span>`;
 }
 
 function renderStats(){
@@ -285,15 +322,16 @@ function renderStats(){
   const out=CO.filter(c=>c.status==='out').length;
   const over=CO.filter(c=>c.status==='overdue').length;
   const ret=CO.filter(c=>c.returnedDate===today()).length;
-  const total=EQ.length;
   document.getElementById('stats').innerHTML=`
-    <div class="stat-card"><div class="stat-label">전체 장비</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">전체 장비</div><div class="stat-value">${EQ.length}</div></div>
     <div class="stat-card"><div class="stat-label">승인 대기</div><div class="stat-value pending">${pending}</div></div>
     <div class="stat-card"><div class="stat-label">반출 중</div><div class="stat-value out">${out}</div></div>
     <div class="stat-card"><div class="stat-label">연체</div><div class="stat-value overdue">${over}</div></div>
     <div class="stat-card"><div class="stat-label">오늘 반납</div><div class="stat-value">${ret}</div></div>`;
   const dot=document.getElementById('pending-dot');
   if(dot)dot.style.display=pending>0?'':'none';
+  document.getElementById('role-display').textContent=isAdmin?'관리자 모드':'직원 모드';
+  document.getElementById('tab-btn-admin').style.display=isAdmin?'':'none';
 }
 
 function renderStatus(){
@@ -304,73 +342,61 @@ function renderStatus(){
     <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 목록</th><th>반출일</th><th>예정 반납일</th><th>상태</th><th></th></tr></thead>
     <tbody>${active.map(c=>{
       const badge=c.status==='overdue'?'<span class="badge badge-overdue">연체</span>':'<span class="badge badge-out">반출 중</span>';
-      const eqNames=(c.equipIds||[]).map(id=>`<span class="code" style="margin:1px;display:inline-block">${getEq(id).code}</span>`).join(' ');
+      const eqList=(c.equipIds||[]).map(id=>`<div class="req-eq-row">${eqTag(id)}</div>`).join('');
       return`<tr>
         <td><strong>${c.person}</strong></td>
         <td>${c.project||'—'}</td>
-        <td style="max-width:280px">${eqNames}</td>
+        <td style="min-width:220px">${eqList}</td>
         <td>${c.outDate}</td><td>${c.returnDate}</td>
         <td>${badge}</td>
-        <td style="display:flex;gap:6px;">
-          ${isAdmin?`<button class="btn btn-sm btn-pdf" onclick="showPdf('${c.id}')">PDF</button><button class="btn btn-sm btn-success" onclick="returnAll('${c.id}')">반납</button>`:''}
-        </td>
+        <td>${isAdmin?`<div style="display:flex;gap:6px;"><button class="btn btn-sm btn-pdf" onclick="showPdf('${c.id}')">PDF</button><button class="btn btn-sm btn-success" onclick="returnAll('${c.id}')">반납</button></div>`:'—'}</td>
       </tr>`;
     }).join('')}</tbody></table></div>`;
 }
 
 function renderAdmin(){
-  const el=document.getElementById('tab-admin');
   const pending=REQUESTS.filter(r=>r.status==='pending');
-  const done=REQUESTS.filter(r=>r.status!=='pending').slice(0,20);
-  let html=`<div class="section-header"><span class="section-title">승인 대기 ${pending.length}건</span></div>`;
-  if(!pending.length){html+='<div class="empty" style="margin-bottom:1.5rem">대기 중인 신청이 없습니다.</div>';}
-  else{
-    html+=`<div class="table-wrap" style="margin-bottom:1.5rem"><table>
-      <thead><tr><th>신청일시</th><th>신청자</th><th>프로젝트</th><th>장비</th><th>반출일</th><th>반납일</th><th>메모</th><th></th></tr></thead>
-      <tbody>${pending.map(r=>{
-        const eqList=(r.equipIds||[]).map(id=>{const eq=getEq(id);return`<div style="font-size:12px"><span class="code">${eq.code}</span> ${eq.name}</div>`;}).join('');
-        return`<tr>
-          <td style="font-size:11px;color:#888">${r.createdAt||''}</td>
-          <td><strong>${r.person}</strong></td>
-          <td>${r.project||'—'}</td>
-          <td style="max-width:220px">${eqList}</td>
-          <td>${r.outDate}</td><td>${r.returnDate}</td>
-          <td style="font-size:12px;color:#888">${r.note||'—'}</td>
-          <td style="display:flex;gap:6px;">
-            <button class="btn btn-sm btn-success" onclick="approveRequest('${r.id}')">승인</button>
-            <button class="btn btn-sm btn-danger" onclick="rejectRequest('${r.id}')">반려</button>
-          </td>
-        </tr>`;
-      }).join('')}</tbody></table></div>`;
-  }
+  const done=REQUESTS.filter(r=>r.status!=='pending').slice(0,30);
+  let html=`<div class="section-header">
+    <span class="section-title">승인 대기 ${pending.length}건</span>
+    <button class="btn btn-sm" onclick="openApproverModal()">승인자: ${approver} ✎</button>
+  </div>`;
+  if(!pending.length)html+='<div class="empty" style="margin-bottom:1.5rem">대기 중인 신청이 없습니다.</div>';
+  else html+=`<div class="table-wrap" style="margin-bottom:1.5rem"><table>
+    <thead><tr><th>신청일시</th><th>신청자</th><th>프로젝트</th><th>장비</th><th>반출일</th><th>반납일</th><th>메모</th><th></th></tr></thead>
+    <tbody>${pending.map(r=>{
+      const eqList=(r.equipIds||[]).map(id=>`<div class="req-eq-row">${eqTag(id)}</div>`).join('');
+      return`<tr>
+        <td style="font-size:11px;color:#888;white-space:nowrap">${r.createdAt||''}</td>
+        <td><strong>${r.person}</strong></td>
+        <td>${r.project||'—'}</td>
+        <td style="min-width:220px">${eqList}</td>
+        <td>${r.outDate}</td><td>${r.returnDate}</td>
+        <td style="font-size:12px;color:#888">${r.note||'—'}</td>
+        <td><div style="display:flex;gap:6px;"><button class="btn btn-sm btn-success" onclick="approveRequest('${r.id}')">승인</button><button class="btn btn-sm btn-danger" onclick="rejectRequest('${r.id}')">반려</button></div></td>
+      </tr>`;
+    }).join('')}</tbody></table></div>`;
   html+=`<div class="section-header"><span class="section-title">처리 완료</span></div>`;
-  if(!done.length){html+='<div class="empty">처리된 신청이 없습니다.</div>';}
-  else{
-    html+=`<div class="table-wrap"><table>
-      <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 수</th><th>반출일</th><th>결과</th></tr></thead>
-      <tbody>${done.map(r=>`<tr>
-        <td>${r.person}</td><td>${r.project||'—'}</td>
-        <td>${(r.equipIds||[]).length}개</td><td>${r.outDate}</td>
-        <td>${r.status==='approved'?'<span class="badge badge-in">승인</span>':'<span class="badge badge-rejected">반려</span>'}</td>
-      </tr>`).join('')}</tbody></table></div>`;
-  }
-  el.innerHTML=html;
+  if(!done.length)html+='<div class="empty">처리된 신청이 없습니다.</div>';
+  else html+=`<div class="table-wrap"><table>
+    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 수</th><th>반출일</th><th>결과</th></tr></thead>
+    <tbody>${done.map(r=>`<tr>
+      <td>${r.person}</td><td>${r.project||'—'}</td>
+      <td>${(r.equipIds||[]).length}개</td><td>${r.outDate}</td>
+      <td>${r.status==='approved'?'<span class="badge badge-in">승인</span>':'<span class="badge badge-rejected">반려</span>'}</td>
+    </tr>`).join('')}</tbody></table></div>`;
+  document.getElementById('tab-admin').innerHTML=html;
 }
 
 function renderEquipment(){
   const cats=[...new Set(EQ.map(e=>e.cat))];
-  const catFilter=document.getElementById('eq-cat-filter2')?document.getElementById('eq-cat-filter2').value:'전체';
-  const search=document.getElementById('eq-search2')?document.getElementById('eq-search2').value.toLowerCase():'';
-  const filtered=EQ.filter(e=>{
-    return(catFilter==='전체'||e.cat===catFilter)&&(!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search));
-  });
-  const el=document.getElementById('tab-equipment');
-  el.innerHTML=`
+  const catF=document.getElementById('eq-cat-f2')?document.getElementById('eq-cat-f2').value:'전체';
+  const srch=document.getElementById('eq-srch2')?document.getElementById('eq-srch2').value.toLowerCase():'';
+  const filtered=EQ.filter(e=>(catF==='전체'||e.cat===catF)&&(!srch||e.name.toLowerCase().includes(srch)||e.code.toLowerCase().includes(srch)));
+  document.getElementById('tab-equipment').innerHTML=`
     <div class="filter-bar">
-      <select id="eq-cat-filter2" onchange="renderEquipment()">
-        <option>전체</option>${cats.map(c=>`<option${catFilter===c?' selected':''}>${c}</option>`).join('')}
-      </select>
-      <input type="text" id="eq-search2" placeholder="장비명 또는 코드 검색" value="${search}" oninput="renderEquipment()">
+      <select id="eq-cat-f2" onchange="renderEquipment()"><option>전체</option>${cats.map(c=>`<option${catF===c?' selected':''}>${c}</option>`).join('')}</select>
+      <input type="text" id="eq-srch2" placeholder="장비명 또는 코드 검색" value="${srch}" oninput="renderEquipment()">
     </div>
     <div class="table-wrap"><table>
       <thead><tr><th>코드</th><th>장비명</th><th>카테고리</th><th>수량</th><th>비고</th><th>상태</th></tr></thead>
@@ -378,9 +404,8 @@ function renderEquipment(){
         const st=eqStatus(e.id);
         const badge=st==='overdue'?'<span class="badge badge-overdue">연체</span>':st==='out'?'<span class="badge badge-out">반출 중</span>':'<span class="badge badge-in">보유 중</span>';
         return`<tr>
-          <td><span class="code">${e.code}</span></td>
-          <td><strong>${e.name}</strong>${e.note?`<br><span style="font-size:11px;color:#aaa">${e.note}</span>`:''}
-          </td>
+          <td><span class="eq-code">${e.code}</span></td>
+          <td><span class="eq-name">${e.name}</span>${e.note?`<br><span style="font-size:11px;color:#aaa">${e.note}</span>`:''}</td>
           <td><span class="cat-badge">${e.cat}</span></td>
           <td>${e.qty}</td>
           <td style="font-size:12px;color:#aaa">${e.note||'—'}</td>
@@ -391,10 +416,9 @@ function renderEquipment(){
 }
 
 function renderHdd(){
-  const el=document.getElementById('tab-hdd');
   const hddEqs=EQ.filter(e=>e.cat==='SSD'||e.cat==='HDD');
   const usedIds=HDD_PROJECTS.flatMap(p=>p.equipIds||[]);
-  const unusedHdds=hddEqs.filter(e=>!usedIds.includes(e.id));
+  const unused=hddEqs.filter(e=>!usedIds.includes(e.id));
   let html=`<div class="section-header">
     <span class="section-title">프로젝트별 외장하드 현황</span>
     ${isAdmin?`<button class="btn btn-sm btn-primary" onclick="openHdd()">+ 프로젝트 연결</button>`:''}
@@ -403,53 +427,88 @@ function renderHdd(){
     html+=HDD_PROJECTS.map(p=>{
       const eqs=(p.equipIds||[]).map(id=>getEq(id));
       return`<div class="hdd-card">
-        <div class="hdd-project">
-          <span>${p.project}</span>
+        <div class="hdd-project"><span>${p.project}</span>
           ${isAdmin?`<button class="btn btn-sm btn-danger" onclick="deleteHddProject('${p.id}')">삭제</button>`:''}
         </div>
-        <div class="hdd-list">${eqs.map(e=>`<span class="hdd-chip"><span style="font-family:monospace;font-size:11px">${e.code}</span> ${e.name}</span>`).join('')}</div>
+        <div class="hdd-list">${eqs.map(e=>`<span class="hdd-chip"><span class="eq-code" style="font-size:11px">${e.code}</span> <span class="eq-name" style="font-size:12px">${e.name}</span></span>`).join('')}</div>
       </div>`;
     }).join('');
-  }else{html+='<div class="empty" style="margin-bottom:1rem">연결된 프로젝트가 없습니다.</div>';}
-  html+=`<div class="section-header" style="margin-top:1.5rem"><span class="section-title">미배정 외장하드 (${unusedHdds.length}개)</span></div>`;
-  if(unusedHdds.length){
+  }else html+='<div class="empty" style="margin-bottom:1rem">연결된 프로젝트가 없습니다.</div>';
+  html+=`<div class="section-header" style="margin-top:1.5rem"><span class="section-title">미배정 외장하드 (${unused.length}개)</span></div>`;
+  if(unused.length){
     html+=`<div class="table-wrap"><table>
       <thead><tr><th>코드</th><th>장비명</th><th>종류</th><th>상태</th></tr></thead>
-      <tbody>${unusedHdds.map(e=>{
+      <tbody>${unused.map(e=>{
         const st=eqStatus(e.id);
         const badge=st==='out'?'<span class="badge badge-out">반출 중</span>':'<span class="badge badge-in">보유 중</span>';
-        return`<tr><td><span class="code">${e.code}</span></td><td>${e.name}</td><td><span class="cat-badge">${e.cat}</span></td><td>${badge}</td></tr>`;
-      }).join('')}</tbody>
-    </table></div>`;
-  }else{html+='<div class="empty">모든 외장하드가 프로젝트에 배정되어 있습니다.</div>';}
-  el.innerHTML=html;
+        return`<tr><td><span class="eq-code">${e.code}</span></td><td><span class="eq-name">${e.name}</span></td><td><span class="cat-badge">${e.cat}</span></td><td>${badge}</td></tr>`;
+      }).join('')}</tbody></table></div>`;
+  }else html+='<div class="empty">모든 외장하드가 프로젝트에 배정되어 있습니다.</div>';
+  document.getElementById('tab-hdd').innerHTML=html;
+}
+
+function renderBackup(){
+  const hddEqs=EQ.filter(e=>e.cat==='SSD'||e.cat==='HDD');
+  const statusOpts=['백업 완료','백업 중','미백업','해당없음'];
+  const statusClass={'백업 완료':'backup-status-done','백업 중':'backup-status-partial','미백업':'backup-status-none','해당없음':''};
+  let html=`<div class="section-header"><span class="section-title">외장하드 백업 현황 (${hddEqs.length}개)</span></div>
+  <div class="table-wrap backup-table"><table>
+    <thead><tr><th>코드</th><th>장비명</th><th>종류</th><th>프로젝트</th><th>백업 상태</th><th>백업 날짜</th><th>메모</th></tr></thead>
+    <tbody>${hddEqs.map(e=>{
+      const proj=HDD_PROJECTS.find(p=>(p.equipIds||[]).includes(e.id));
+      const bk=BACKUPS.find(b=>b.eqId===e.id)||{status:'해당없음',date:'',memo:''};
+      const sc=statusClass[bk.status]||'';
+      return`<tr>
+        <td><span class="eq-code">${e.code}</span></td>
+        <td><span class="eq-name">${e.name}</span></td>
+        <td><span class="cat-badge">${e.cat}</span></td>
+        <td>${proj?proj.project:'<span style="color:#aaa">미배정</span>'}</td>
+        <td>${isAdmin
+          ?`<select onchange="updateBackup('${e.id}','status',this.value)" style="width:auto;font-size:12px;padding:4px 8px;">${statusOpts.map(s=>`<option${bk.status===s?' selected':''}>${s}</option>`).join('')}</select>`
+          :`<span class="${sc}">${bk.status}</span>`}
+        </td>
+        <td>${isAdmin
+          ?`<input type="date" value="${bk.date}" onchange="updateBackup('${e.id}','date',this.value)" style="width:130px;font-size:12px;padding:4px 8px;">`
+          :(bk.date||'—')}
+        </td>
+        <td>${isAdmin
+          ?`<input type="text" value="${bk.memo||''}" placeholder="메모" onchange="updateBackup('${e.id}','memo',this.value)" style="font-size:12px;padding:4px 8px;">`
+          :(bk.memo||'—')}
+        </td>
+      </tr>`;
+    }).join('')}</tbody></table></div>`;
+  document.getElementById('tab-backup').innerHTML=html;
+}
+
+function updateBackup(eqId,field,value){
+  let bk=BACKUPS.find(b=>b.eqId===eqId);
+  if(!bk){bk={eqId,status:'해당없음',date:'',memo:''};BACKUPS.push(bk);}
+  bk[field]=value;
+  saveAll();
 }
 
 function renderHistory(){
-  const el=document.getElementById('tab-history');
   const returned=CO.filter(c=>c.status==='returned').sort((a,b)=>(b.returnedDate||'').localeCompare(a.returnedDate||''));
-  el.innerHTML=`<div class="table-wrap"><table>
+  document.getElementById('tab-history').innerHTML=`<div class="table-wrap"><table>
     <thead><tr><th>신청자</th><th>프로젝트</th><th>장비</th><th>반출일</th><th>반납일</th><th>메모</th></tr></thead>
     <tbody>${returned.length===0?`<tr><td colspan="6"><div class="empty">반납 완료된 이력이 없습니다.</div></td></tr>`:returned.map(c=>{
-      const eqNames=(c.equipIds||[]).map(id=>`<span class="code" style="margin:1px;display:inline-block">${getEq(id).code}</span>`).join(' ');
+      const eqList=(c.equipIds||[]).map(id=>`<div class="req-eq-row">${eqTag(id)}</div>`).join('');
       return`<tr>
         <td>${c.person}</td><td>${c.project||'—'}</td>
-        <td style="max-width:260px">${eqNames}</td>
+        <td style="min-width:200px">${eqList}</td>
         <td>${c.outDate}</td><td>${c.returnedDate||'—'}</td>
         <td style="font-size:12px;color:#888">${c.note||'—'}</td>
       </tr>`;
-    }).join('')}</tbody>
-  </table></div>`;
+    }).join('')}</tbody></table></div>`;
 }
 
 function render(){
   checkOverdue();renderStats();
-  document.getElementById('role-display').textContent=isAdmin?'관리자 모드':'직원 모드';
-  document.getElementById('tab-btn-admin').style.display=isAdmin?'':'none';
   if(tab==='status')renderStatus();
   else if(tab==='admin')renderAdmin();
   else if(tab==='equipment')renderEquipment();
   else if(tab==='hdd')renderHdd();
+  else if(tab==='backup')renderBackup();
   else renderHistory();
 }
 
@@ -457,16 +516,18 @@ function switchTab(t,el){
   tab=t;
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   el.classList.add('active');
-  ['status','admin','equipment','hdd','history'].forEach(x=>{document.getElementById('tab-'+x).style.display=x===t?'':'none';});
+  TABS.forEach(x=>{document.getElementById('tab-'+x).style.display=x===t?'':'none';});
   render();
 }
 
+// 반출 신청 모달 — 매번 완전 초기화
 function openRequest(){
   document.getElementById('req-person').value='';
   document.getElementById('req-project').value='';
   document.getElementById('req-out').value=today();
   document.getElementById('req-ret').value='';
   document.getElementById('req-note').value='';
+  document.getElementById('req-search').value='';
   const cats=[...new Set(EQ.map(e=>e.cat))];
   const catSel=document.getElementById('req-cat-filter');
   catSel.innerHTML='<option value="">전체</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
@@ -475,21 +536,17 @@ function openRequest(){
 }
 
 function buildReqList(search,cat){
-  const list=document.getElementById('req-eq-list');
-  const filtered=EQ.filter(e=>{
-    return(!cat||e.cat===cat)&&(!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search));
-  });
-  list.innerHTML=filtered.map(e=>{
+  const filtered=EQ.filter(e=>(!cat||e.cat===cat)&&(!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search)));
+  document.getElementById('req-eq-list').innerHTML=filtered.map(e=>{
     const st=eqStatus(e.id);
     const isOut=st!=='in';
-    const checked=document.querySelector(`input[data-eq="${e.id}"]`)?.checked?'checked':'';
     return`<label class="eq-check-item${isOut?' disabled':''}">
-      <input type="checkbox" data-eq="${e.id}" ${isOut?'disabled':''} ${checked} onchange="updateReqSummary()">
+      <input type="checkbox" data-eq="${e.id}" ${isOut?'disabled':''} onchange="updateReqSummary()">
       <div class="eq-check-info">
-        <div class="eq-check-name"><span class="code">${e.code}</span> ${e.name}</div>
+        <div class="eq-check-name"><span class="eq-code">${e.code}</span> <span class="eq-name">${e.name}</span></div>
         <div class="eq-check-sub">${e.cat}${e.note?' · '+e.note:''}</div>
       </div>
-      <div class="eq-check-status">${isOut?`<span class="badge badge-out">반출 중</span>`:''}</div>
+      <div>${isOut?`<span class="badge badge-out" style="font-size:10px">반출 중</span>`:''}</div>
     </label>`;
   }).join('');
   updateReqSummary();
@@ -498,13 +555,28 @@ function buildReqList(search,cat){
 function filterReqList(){
   const search=document.getElementById('req-search').value.toLowerCase();
   const cat=document.getElementById('req-cat-filter').value;
-  buildReqList(search,cat);
+  // 현재 체크된 항목 기억
+  const checked=new Set([...document.querySelectorAll('#req-eq-list input[type=checkbox]:checked')].map(i=>i.dataset.eq));
+  const filtered=EQ.filter(e=>(!cat||e.cat===cat)&&(!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search)));
+  document.getElementById('req-eq-list').innerHTML=filtered.map(e=>{
+    const st=eqStatus(e.id);
+    const isOut=st!=='in';
+    const wasChecked=checked.has(e.id)&&!isOut;
+    return`<label class="eq-check-item${isOut?' disabled':''}">
+      <input type="checkbox" data-eq="${e.id}" ${isOut?'disabled':''} ${wasChecked?'checked':''} onchange="updateReqSummary()">
+      <div class="eq-check-info">
+        <div class="eq-check-name"><span class="eq-code">${e.code}</span> <span class="eq-name">${e.name}</span></div>
+        <div class="eq-check-sub">${e.cat}${e.note?' · '+e.note:''}</div>
+      </div>
+      <div>${isOut?`<span class="badge badge-out" style="font-size:10px">반출 중</span>`:''}</div>
+    </label>`;
+  }).join('');
+  updateReqSummary();
 }
 
 function updateReqSummary(){
   const checked=[...document.querySelectorAll('#req-eq-list input[type=checkbox]:checked')];
-  const el=document.getElementById('req-selected-summary');
-  el.textContent=checked.length?`${checked.length}개 장비 선택됨`:'';
+  document.getElementById('req-selected-summary').textContent=checked.length?`${checked.length}개 장비 선택됨`:'';
 }
 
 function closeModal(id){document.getElementById(id).classList.remove('open');}
@@ -534,15 +606,13 @@ function approveRequest(id){
 function rejectRequest(id){
   const r=REQUESTS.find(x=>x.id===id);
   if(!r||!confirm('신청을 반려하시겠습니까?'))return;
-  r.status='rejected';
-  saveAll();showToast('반려 처리됨');render();
+  r.status='rejected';saveAll();showToast('반려 처리됨');render();
 }
 
 function returnAll(id){
   const c=CO.find(x=>x.id===id);
   if(!c||!confirm('해당 반출건을 반납 처리하시겠습니까?'))return;
-  c.status='returned';c.returnedDate=today();
-  saveAll();showToast('반납 처리 완료');render();
+  c.status='returned';c.returnedDate=today();saveAll();showToast('반납 처리 완료');render();
 }
 
 function showPdf(id){
@@ -565,10 +635,19 @@ function showPdf(id){
     </table>
     <div class="sign-area">
       <div class="sign-box"><div class="sign-label">신청자</div><div class="sign-name">${c.person}</div></div>
-      <div class="sign-box"><div class="sign-label">승인자</div><div class="sign-name">이상협</div></div>
+      <div class="sign-box"><div class="sign-label">승인자</div><div class="sign-name">${approver}</div></div>
       <div class="sign-box"><div class="sign-label">반납 확인</div><div class="sign-name"></div></div>
     </div>`;
   document.getElementById('modal-pdf').classList.add('open');
+}
+
+function openApproverModal(){
+  document.getElementById('approver-select').value=approver;
+  document.getElementById('modal-approver').classList.add('open');
+}
+function saveApprover(){
+  approver=document.getElementById('approver-select').value;
+  saveAll();showToast(`승인자: ${approver}`);closeModal('modal-approver');render();
 }
 
 function openHdd(){
@@ -580,7 +659,7 @@ function openHdd(){
     return`<label class="eq-check-item${used?' disabled':''}">
       <input type="checkbox" data-eq="${e.id}" ${used?'disabled':''}>
       <div class="eq-check-info">
-        <div class="eq-check-name"><span class="code">${e.code}</span> ${e.name}</div>
+        <div class="eq-check-name"><span class="eq-code">${e.code}</span> <span class="eq-name">${e.name}</span></div>
         <div class="eq-check-sub">${e.cat}</div>
       </div>
       ${used?'<span style="font-size:11px;color:#aaa">배정됨</span>':''}
