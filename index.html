@@ -29,10 +29,13 @@
   .btn-danger:hover { background: #fff0f0; }
   .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .section-title { font-size: 13px; font-weight: 600; color: #888; }
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+  .filter-bar select, .filter-bar input { padding: 7px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff; color: #1a1a1a; outline: none; }
+  .filter-bar input { flex: 1; }
   .table-wrap { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; overflow: hidden; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th { background: #fafafa; padding: 10px 16px; text-align: left; font-weight: 600; font-size: 11px; color: #888; border-bottom: 1px solid #e8e8e8; text-transform: uppercase; letter-spacing: 0.05em; }
-  td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; color: #1a1a1a; vertical-align: middle; }
+  td { padding: 11px 16px; border-bottom: 1px solid #f0f0f0; color: #1a1a1a; vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #fafafa; }
   .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
@@ -40,14 +43,15 @@
   .badge-out { background: #e3f2fd; color: #1565c0; }
   .badge-overdue { background: #ffebee; color: #c62828; }
   .cat-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; background: #f0f0f0; color: #555; }
+  .code { font-family: monospace; font-size: 12px; color: #666; background: #f5f5f5; padding: 2px 6px; border-radius: 4px; }
   .empty { text-align: center; padding: 2.5rem; color: #aaa; font-size: 14px; }
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
-  .modal { background: #fff; border-radius: 14px; padding: 1.75rem; width: 460px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+  .modal { background: #fff; border-radius: 14px; padding: 1.75rem; width: 480px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
   .modal-title { font-size: 17px; font-weight: 600; margin-bottom: 1.25rem; }
   .form-row { margin-bottom: 14px; }
   .form-label { font-size: 12px; color: #888; margin-bottom: 5px; display: block; font-weight: 500; }
-  input[type=text], input[type=date], input[type=number], select { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff; color: #1a1a1a; outline: none; }
+  input[type=text], input[type=date], input[type=number], select, textarea { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff; color: #1a1a1a; outline: none; }
   input:focus, select:focus { border-color: #1a1a1a; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.5rem; }
@@ -68,15 +72,12 @@
     </div>
     <button class="btn btn-primary" onclick="openCheckout()">+ 반출 등록</button>
   </div>
-
   <div class="stats-grid" id="stats"></div>
-
   <div class="tab-bar">
     <button class="tab active" onclick="switchTab('status',this)">반출 현황</button>
     <button class="tab" onclick="switchTab('equipment',this)">장비 목록</button>
     <button class="tab" onclick="switchTab('history',this)">반출 이력</button>
   </div>
-
   <div id="tab-status"></div>
   <div id="tab-equipment" style="display:none"></div>
   <div id="tab-history" style="display:none"></div>
@@ -105,17 +106,23 @@
 <div class="modal-overlay" id="modal-equip">
   <div class="modal">
     <div class="modal-title">장비 추가</div>
-    <div class="form-row"><label class="form-label">장비명</label><input type="text" id="eq-name" placeholder="예) Sony FX6"></div>
     <div class="form-grid">
+      <div class="form-row"><label class="form-label">장비 코드</label><input type="text" id="eq-code" placeholder="예) FCAM0001"></div>
       <div class="form-row"><label class="form-label">카테고리</label>
         <select id="eq-cat">
-          <option>카메라</option><option>렌즈</option><option>조명</option>
-          <option>오디오</option><option>드론</option><option>짐벌/리그</option><option>기타</option>
+          <option>카메라</option><option>카메라 세트</option><option>배터리</option>
+          <option>오디오</option><option>하드웨어</option><option>보조배터리</option>
+          <option>컴퓨터</option><option>허브</option><option>SD</option><option>기타</option>
         </select>
       </div>
-      <div class="form-row"><label class="form-label">수량</label><input type="number" id="eq-qty" value="1" min="1"></div>
     </div>
-    <div class="form-row"><label class="form-label">시리얼 / 관리번호</label><input type="text" id="eq-serial" placeholder="(선택)"></div>
+    <div class="form-row"><label class="form-label">품명</label><input type="text" id="eq-name" placeholder="예) DJI Osmo Pocket 3"></div>
+    <div class="form-row"><label class="form-label">모델명</label><input type="text" id="eq-model" placeholder="예) DJI Osmo Pocket 3"></div>
+    <div class="form-grid">
+      <div class="form-row"><label class="form-label">수량</label><input type="number" id="eq-qty" value="1" min="1"></div>
+      <div class="form-row"><label class="form-label">물품 위치</label><input type="text" id="eq-loc" placeholder="예) 201호"></div>
+    </div>
+    <div class="form-row"><label class="form-label">비고</label><input type="text" id="eq-note" placeholder="(선택)"></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-equip')">취소</button>
       <button class="btn btn-primary" onclick="submitEquip()">추가</button>
@@ -126,75 +133,84 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyBjbDJ5_dkBDEsRZYi2gQpleri7agfRgsWyghMgNLiPksciN5ZmgqslLYCZb0r4yz0/exec';
-const USE_GAS = true;
-
 const DEFAULT_EQ = [
-  { id:'e1', name:'Sony FX6', cat:'카메라', qty:1, serial:'SN-001' },
-  { id:'e2', name:'Canon EOS R5', cat:'카메라', qty:2, serial:'' },
-  { id:'e3', name:'Aputure 600D', cat:'조명', qty:3, serial:'' },
-  { id:'e4', name:'DJI Ronin 4D', cat:'짐벌/리그', qty:1, serial:'SN-042' },
-  { id:'e5', name:'Rode NTG5', cat:'오디오', qty:2, serial:'' },
-  { id:'e6', name:'DJI Mavic 3 Pro', cat:'드론', qty:1, serial:'SN-007' }
+  {id:'e1',code:'FCMS0001',cat:'카메라 세트',name:'DJI Osmo Pocket 3',model:'카메라 세트',qty:1,loc:'201호',note:'삼각대,마이크,소형배터리,윈드스크린'},
+  {id:'e2',code:'FCAM0001',cat:'카메라',name:'DJI Osmo Pocket 3',model:'핸디캠',qty:1,loc:'201호',note:'핸드카메라'},
+  {id:'e3',code:'FBAT0001',cat:'배터리',name:'DJI Osmo 배터리 소형',model:'카메라 배터리 소형',qty:1,loc:'201호',note:''},
+  {id:'e4',code:'FBAT0002',cat:'배터리',name:'DJI Osmo 배터리 대형',model:'카메라 배터리 대형',qty:1,loc:'201호',note:''},
+  {id:'e5',code:'FBAT0003',cat:'배터리',name:'DJI Osmo 배터리 대형',model:'카메라 배터리 대형',qty:1,loc:'201호',note:''},
+  {id:'e6',code:'FBAT0004',cat:'배터리',name:'DJI Osmo 배터리 대형',model:'카메라 배터리 대형',qty:1,loc:'201호',note:''},
+  {id:'e7',code:'FBAT0005',cat:'배터리',name:'DJI Osmo 배터리 소형',model:'카메라 배터리 소형',qty:1,loc:'201호',note:''},
+  {id:'e8',code:'FSDM0001',cat:'오디오',name:'DJI Osmo 마이크',model:'Osmo 마이크',qty:1,loc:'201호',note:'마이크'},
+  {id:'e9',code:'FSDM0002',cat:'오디오',name:'DJI 마이크',model:'DJI 마이크',qty:1,loc:'201호',note:'구성 마이크 2개'},
+  {id:'e10',code:'FSDM0003',cat:'오디오',name:'DJI MINI 마이크',model:'DJI 미니 마이크',qty:1,loc:'201호',note:'구성 마이크 2개'},
+  {id:'e11',code:'FSDM0004',cat:'오디오',name:'마이크 윈드스크린',model:'마이크 윈드 스크린',qty:5,loc:'201호',note:''},
+  {id:'e12',code:'FSDM0005',cat:'오디오',name:'오디오 케이블',model:'오디오 케이블',qty:1,loc:'201호',note:''},
+  {id:'e13',code:'MSSD01',cat:'하드웨어',name:'SSD 외장하드 1',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e14',code:'MSSD02',cat:'하드웨어',name:'SSD 외장하드 2',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e15',code:'MSSD03',cat:'하드웨어',name:'SSD 외장하드 3',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e16',code:'MSSD04',cat:'하드웨어',name:'SSD 외장하드 4',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e17',code:'MSSD05',cat:'하드웨어',name:'SSD 외장하드 5',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e18',code:'MSSD06',cat:'하드웨어',name:'SSD 외장하드 6',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e19',code:'MSSD07',cat:'하드웨어',name:'SSD 외장하드 7',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e20',code:'MSSD08',cat:'하드웨어',name:'SSD 외장하드 8',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e21',code:'MSSD09',cat:'하드웨어',name:'SSD 외장하드 9',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e22',code:'MSSD10',cat:'하드웨어',name:'SSD 외장하드 10',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e23',code:'MSSD11',cat:'하드웨어',name:'SSD 외장하드 11',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e24',code:'MHDD01',cat:'하드웨어',name:'HDD 외장하드 1',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e25',code:'MHDD02',cat:'하드웨어',name:'HDD 외장하드 2',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e26',code:'MHDD03',cat:'하드웨어',name:'HDD 외장하드 3',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e27',code:'MHDD04',cat:'하드웨어',name:'HDD 외장하드 4',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e28',code:'MHDD05',cat:'하드웨어',name:'HDD 외장하드 5',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e29',code:'MHDD06',cat:'하드웨어',name:'HDD 외장하드 6',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e30',code:'MHDD07',cat:'하드웨어',name:'HDD 외장하드 7',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e31',code:'MHDD08',cat:'하드웨어',name:'HDD 외장하드 8',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e32',code:'MHDD09',cat:'하드웨어',name:'HDD 외장하드 9',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e33',code:'MHDD10',cat:'하드웨어',name:'HDD 외장하드 10',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e34',code:'MHDD11',cat:'하드웨어',name:'HDD 외장하드 11',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e35',code:'MHDD12',cat:'하드웨어',name:'HDD 외장하드 12',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e36',code:'MHDD13',cat:'하드웨어',name:'HDD 외장하드 13',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e37',code:'MHDD14',cat:'하드웨어',name:'HDD 외장하드 14',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e38',code:'MHDD15',cat:'하드웨어',name:'HDD 외장하드 15',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e39',code:'MHDD16',cat:'하드웨어',name:'HDD 외장하드 16',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e40',code:'MHDD17',cat:'하드웨어',name:'HDD 외장하드 17',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e41',code:'MHDD18',cat:'하드웨어',name:'HDD 외장하드 18',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e42',code:'MHDD19',cat:'하드웨어',name:'HDD 외장하드 19',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e43',code:'MHDD20',cat:'하드웨어',name:'HDD 외장하드 20',model:'외장하드',qty:1,loc:'201호',note:''},
+  {id:'e44',code:'FPC0001',cat:'보조배터리',name:'P1 보조배터리 1',model:'P1 보조배터리',qty:1,loc:'201호',note:''},
+  {id:'e45',code:'FPC0002',cat:'보조배터리',name:'P1 보조배터리 2',model:'P1 보조배터리',qty:1,loc:'201호',note:''},
+  {id:'e46',code:'FPC0003',cat:'보조배터리',name:'P1 보조배터리 3',model:'P1 보조배터리',qty:1,loc:'201호',note:''},
+  {id:'e47',code:'MCP0001',cat:'컴퓨터',name:'맥북에어 2023 (양수빈)',model:'APPLE2023',qty:1,loc:'201호',note:''},
+  {id:'e48',code:'MCP0002',cat:'컴퓨터',name:'맥북에어 2024 (김종원)',model:'APPLE2024',qty:1,loc:'201호',note:''},
+  {id:'e49',code:'MCP0002',cat:'컴퓨터',name:'맥북에어 2024 (정재홍)',model:'APPLE2024',qty:1,loc:'201호',note:''},
+  {id:'e50',code:'MCP0003',cat:'컴퓨터',name:'맥북에어 2024 (한상아)',model:'APPLE2024',qty:1,loc:'201호',note:''},
+  {id:'e51',code:'MHUB0001',cat:'허브',name:'Belkin Hub 1',model:'belkin Hub',qty:1,loc:'201호',note:''},
+  {id:'e52',code:'MHUB0002',cat:'허브',name:'Belkin Hub 2',model:'belkin Hub',qty:1,loc:'201호',note:''},
+  {id:'e53',code:'MSDC0001',cat:'SD',name:'SANDISK micro SD 1',model:'SANDISK micro SD',qty:1,loc:'201호',note:''},
+  {id:'e54',code:'MSDC0002',cat:'SD',name:'SANDISK micro SD 2',model:'SANDISK micro SD',qty:1,loc:'201호',note:''},
+  {id:'e55',code:'MSDC0003',cat:'SD',name:'SANDISK micro SD 3',model:'SANDISK micro SD',qty:1,loc:'201호',note:''},
 ];
 
-let EQ = [], CO = [], tab = 'status';
+let EQ=[], CO=[], tab='status';
 
-function today() { return new Date().toISOString().split('T')[0]; }
-function getEq(id) { return EQ.find(e=>e.id===id)||{name:'(삭제된 장비)',cat:''}; }
-function eqStatus(id) {
-  const a = CO.filter(c=>c.equipId===id&&c.status!=='returned');
-  return a.length ? a[0].status : 'in';
-}
-function checkOverdue() {
-  CO.forEach(c=>{ if(c.status==='out'&&c.returnDate<today()) c.status='overdue'; });
-}
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
-}
-function lsGet(k,def) { try { return JSON.parse(localStorage.getItem(k))||def; } catch { return def; } }
-function lsSet(k,v) { try { localStorage.setItem(k,JSON.stringify(v)); } catch {} }
+function today(){return new Date().toISOString().split('T')[0];}
+function getEq(id){return EQ.find(e=>e.id===id)||{name:'(삭제된 장비)',cat:'',code:''};}
+function eqStatus(id){const a=CO.filter(c=>c.equipId===id&&c.status!=='returned');return a.length?a[0].status:'in';}
+function checkOverdue(){CO.forEach(c=>{if(c.status==='out'&&c.returnDate<today())c.status='overdue';});}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function lsGet(k,def){try{return JSON.parse(localStorage.getItem(k))||def;}catch{return def;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
-async function gasGet() {
-  try {
-    const res = await fetch(GAS_URL + '?action=getAll');
-    const data = await res.json();
-    return data;
-  } catch { return null; }
+function loadData(){
+  EQ=lsGet('vdot_eq_v3',null);
+  if(!EQ){EQ=[...DEFAULT_EQ];lsSet('vdot_eq_v3',EQ);}
+  CO=lsGet('vdot_co_v3',[]);
 }
-async function gasSet(action, data) {
-  try {
-    await fetch(`${GAS_URL}?action=${action}&data=${encodeURIComponent(JSON.stringify(data))}`);
-  } catch {}
-}
+function saveEQ(){lsSet('vdot_eq_v3',EQ);}
+function saveCO(){lsSet('vdot_co_v3',CO);}
 
-async function loadData() {
-  if (USE_GAS) {
-    const data = await gasGet();
-    if (data && data.equipments !== undefined) {
-      EQ = data.equipments.length ? data.equipments : DEFAULT_EQ;
-      CO = data.checkouts || [];
-      if (!data.equipments.length) await gasSet('saveEquipments', EQ);
-      return;
-    }
-  }
-  EQ = lsGet('vdot_eq', DEFAULT_EQ);
-  CO = lsGet('vdot_co', []);
-}
-
-async function saveEQ() {
-  lsSet('vdot_eq', EQ);
-  if (USE_GAS) await gasSet('saveEquipments', EQ);
-}
-async function saveCO() {
-  lsSet('vdot_co', CO);
-  if (USE_GAS) await gasSet('saveCheckouts', CO);
-}
-
-function renderStats() {
-  const total=EQ.length, out=CO.filter(c=>c.status==='out').length,
+function renderStats(){
+  const total=EQ.length,out=CO.filter(c=>c.status==='out').length,
         over=CO.filter(c=>c.status==='overdue').length,
         ret=CO.filter(c=>c.returnedDate===today()).length;
   document.getElementById('stats').innerHTML=`
@@ -204,16 +220,17 @@ function renderStats() {
     <div class="stat-card"><div class="stat-label">오늘 반납</div><div class="stat-value">${ret}</div></div>`;
 }
 
-function renderStatus() {
+function renderStatus(){
   const active=CO.filter(c=>c.status!=='returned');
   const el=document.getElementById('tab-status');
   if(!active.length){el.innerHTML='<div class="empty">현재 반출 중인 장비가 없습니다.</div>';return;}
   el.innerHTML=`<div class="table-wrap"><table>
-    <thead><tr><th>장비</th><th>담당자</th><th>프로젝트</th><th>반출일</th><th>예정 반납일</th><th>상태</th><th></th></tr></thead>
+    <thead><tr><th>코드</th><th>장비</th><th>담당자</th><th>프로젝트</th><th>반출일</th><th>예정 반납일</th><th>상태</th><th></th></tr></thead>
     <tbody>${active.map(c=>{
       const eq=getEq(c.equipId);
       const badge=c.status==='overdue'?'<span class="badge badge-overdue">연체</span>':'<span class="badge badge-out">반출 중</span>';
       return `<tr>
+        <td><span class="code">${eq.code||''}</span></td>
         <td><strong>${eq.name}</strong><br><span style="font-size:11px;color:#888">${eq.cat}</span></td>
         <td>${c.person}</td><td>${c.project||'—'}</td>
         <td>${c.outDate}</td><td>${c.returnDate}</td>
@@ -223,23 +240,39 @@ function renderStatus() {
     }).join('')}</tbody></table></div>`;
 }
 
-function renderEquipment() {
+function renderEquipment(){
+  const cats=[...new Set(EQ.map(e=>e.cat))];
+  const catFilter=document.getElementById('eq-cat-filter')?document.getElementById('eq-cat-filter').value:'전체';
+  const search=document.getElementById('eq-search')?document.getElementById('eq-search').value.toLowerCase():'';
+  const filtered=EQ.filter(e=>{
+    const matchCat=catFilter==='전체'||e.cat===catFilter;
+    const matchSearch=!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search);
+    return matchCat&&matchSearch;
+  });
   const el=document.getElementById('tab-equipment');
   el.innerHTML=`
     <div class="section-header">
       <span class="section-title">총 ${EQ.length}개 장비</span>
       <button class="btn btn-sm" onclick="openEquip()">+ 장비 추가</button>
     </div>
+    <div class="filter-bar">
+      <select id="eq-cat-filter" onchange="renderEquipment()">
+        <option>전체</option>${cats.map(c=>`<option${catFilter===c?' selected':''}>${c}</option>`).join('')}
+      </select>
+      <input type="text" id="eq-search" placeholder="장비명 또는 코드 검색" value="${search}" oninput="renderEquipment()">
+    </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>장비명</th><th>카테고리</th><th>수량</th><th>관리번호</th><th>상태</th><th></th></tr></thead>
-      <tbody>${EQ.length===0?`<tr><td colspan="6"><div class="empty">장비를 추가해주세요.</div></td></tr>`:EQ.map(e=>{
+      <thead><tr><th>코드</th><th>장비명</th><th>카테고리</th><th>수량</th><th>위치</th><th>상태</th><th></th></tr></thead>
+      <tbody>${filtered.length===0?`<tr><td colspan="7"><div class="empty">해당하는 장비가 없습니다.</div></td></tr>`:filtered.map(e=>{
         const st=eqStatus(e.id);
         const badge=st==='overdue'?'<span class="badge badge-overdue">연체</span>':st==='out'?'<span class="badge badge-out">반출 중</span>':'<span class="badge badge-in">보유 중</span>';
         return `<tr>
-          <td><strong>${e.name}</strong></td>
+          <td><span class="code">${e.code}</span></td>
+          <td><strong>${e.name}</strong>${e.note?`<br><span style="font-size:11px;color:#aaa">${e.note}</span>`:''}
+          </td>
           <td><span class="cat-badge">${e.cat}</span></td>
           <td>${e.qty}</td>
-          <td style="color:#888;font-size:12px">${e.serial||'—'}</td>
+          <td style="color:#888;font-size:12px">${e.loc||'—'}</td>
           <td>${badge}</td>
           <td><button class="btn btn-sm btn-danger" onclick="deleteEquip('${e.id}')">삭제</button></td>
         </tr>`;
@@ -247,15 +280,16 @@ function renderEquipment() {
     </table></div>`;
 }
 
-function renderHistory() {
+function renderHistory(){
   const el=document.getElementById('tab-history');
   const sorted=[...CO].sort((a,b)=>(b.outDate||'').localeCompare(a.outDate||''));
   el.innerHTML=`<div class="table-wrap"><table>
-    <thead><tr><th>장비</th><th>담당자</th><th>프로젝트</th><th>반출일</th><th>반납일</th><th>메모</th><th>상태</th></tr></thead>
-    <tbody>${sorted.length===0?`<tr><td colspan="7"><div class="empty">반출 이력이 없습니다.</div></td></tr>`:sorted.map(c=>{
+    <thead><tr><th>코드</th><th>장비</th><th>담당자</th><th>프로젝트</th><th>반출일</th><th>반납일</th><th>메모</th><th>상태</th></tr></thead>
+    <tbody>${sorted.length===0?`<tr><td colspan="8"><div class="empty">반출 이력이 없습니다.</div></td></tr>`:sorted.map(c=>{
       const eq=getEq(c.equipId);
       const badge=c.status==='returned'?'<span class="badge badge-in">반납 완료</span>':c.status==='overdue'?'<span class="badge badge-overdue">연체</span>':'<span class="badge badge-out">반출 중</span>';
       return `<tr>
+        <td><span class="code">${eq.code||''}</span></td>
         <td>${eq.name}</td><td>${c.person}</td><td>${c.project||'—'}</td>
         <td>${c.outDate}</td><td>${c.returnedDate||c.returnDate}</td>
         <td style="font-size:12px;color:#888">${c.note||'—'}</td>
@@ -265,28 +299,25 @@ function renderHistory() {
   </table></div>`;
 }
 
-function render() {
-  checkOverdue();
-  renderStats();
-  if(tab==='status') renderStatus();
-  else if(tab==='equipment') renderEquipment();
+function render(){
+  checkOverdue();renderStats();
+  if(tab==='status')renderStatus();
+  else if(tab==='equipment')renderEquipment();
   else renderHistory();
 }
 
-function switchTab(t,el) {
+function switchTab(t,el){
   tab=t;
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   el.classList.add('active');
-  ['status','equipment','history'].forEach(x=>{
-    document.getElementById('tab-'+x).style.display=x===t?'':'none';
-  });
+  ['status','equipment','history'].forEach(x=>{document.getElementById('tab-'+x).style.display=x===t?'':'none';});
   render();
 }
 
-function openCheckout() {
+function openCheckout(){
   const avail=EQ.filter(e=>eqStatus(e.id)==='in');
   if(!avail.length){alert('현재 반출 가능한 장비가 없습니다.');return;}
-  document.getElementById('co-eq').innerHTML=avail.map(e=>`<option value="${e.id}">${e.name} (${e.cat})</option>`).join('');
+  document.getElementById('co-eq').innerHTML=avail.map(e=>`<option value="${e.id}">[${e.code}] ${e.name}</option>`).join('');
   document.getElementById('co-out').value=today();
   document.getElementById('co-ret').value='';
   document.getElementById('co-person').value='';
@@ -294,63 +325,55 @@ function openCheckout() {
   document.getElementById('co-note').value='';
   document.getElementById('modal-checkout').classList.add('open');
 }
+function closeModal(id){document.getElementById(id).classList.remove('open');}
 
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-async function submitCheckout() {
+function submitCheckout(){
   const equipId=document.getElementById('co-eq').value;
   const person=document.getElementById('co-person').value.trim();
   const project=document.getElementById('co-proj').value.trim();
   const outDate=document.getElementById('co-out').value;
   const returnDate=document.getElementById('co-ret').value;
   if(!person||!outDate||!returnDate){alert('담당자, 반출일, 예정 반납일을 입력해주세요.');return;}
-  CO.push({ id:'c'+Date.now(), equipId, person, project, outDate, returnDate,
-    status: returnDate<today()?'overdue':'out', returnedDate:'',
-    note: document.getElementById('co-note').value.trim() });
-  await saveCO();
-  showToast('반출 등록 완료');
-  closeModal('modal-checkout'); render();
+  CO.push({id:'c'+Date.now(),equipId,person,project,outDate,returnDate,
+    status:returnDate<today()?'overdue':'out',returnedDate:'',
+    note:document.getElementById('co-note').value.trim()});
+  saveCO();showToast('반출 등록 완료');closeModal('modal-checkout');render();
 }
 
-async function returnEquip(id) {
+function returnEquip(id){
   const c=CO.find(x=>x.id===id);
-  if(!c||!confirm(`${getEq(c.equipId).name} 반납 처리하시겠습니까?`)) return;
-  c.status='returned'; c.returnedDate=today();
-  await saveCO();
-  showToast('반납 처리 완료'); render();
+  if(!c||!confirm(`${getEq(c.equipId).name} 반납 처리하시겠습니까?`))return;
+  c.status='returned';c.returnedDate=today();
+  saveCO();showToast('반납 처리 완료');render();
 }
 
-function openEquip() {
-  document.getElementById('eq-name').value='';
+function openEquip(){
+  ['eq-code','eq-name','eq-model','eq-loc','eq-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('eq-qty').value=1;
-  document.getElementById('eq-serial').value='';
   document.getElementById('modal-equip').classList.add('open');
 }
 
-async function submitEquip() {
+function submitEquip(){
   const name=document.getElementById('eq-name').value.trim();
   if(!name){alert('장비명을 입력해주세요.');return;}
-  EQ.push({ id:'e'+Date.now(), name, cat:document.getElementById('eq-cat').value,
+  EQ.push({id:'e'+Date.now(),
+    code:document.getElementById('eq-code').value.trim(),
+    cat:document.getElementById('eq-cat').value,
+    name,model:document.getElementById('eq-model').value.trim(),
     qty:parseInt(document.getElementById('eq-qty').value)||1,
-    serial:document.getElementById('eq-serial').value.trim() });
-  await saveEQ();
-  showToast('장비 추가 완료');
-  closeModal('modal-equip'); render();
+    loc:document.getElementById('eq-loc').value.trim(),
+    note:document.getElementById('eq-note').value.trim()});
+  saveEQ();showToast('장비 추가 완료');closeModal('modal-equip');render();
 }
 
-async function deleteEquip(id) {
+function deleteEquip(id){
   const eq=getEq(id);
-  if(!confirm(`"${eq.name}" 장비를 삭제하시겠습니까?`)) return;
+  if(!confirm(`"${eq.name}" 장비를 삭제하시겠습니까?`))return;
   EQ=EQ.filter(e=>e.id!==id);
-  await saveEQ();
-  showToast('장비 삭제 완료'); render();
+  saveEQ();showToast('장비 삭제 완료');render();
 }
 
-async function init() {
-  await loadData();
-  render();
-}
-init();
+loadData();render();
 </script>
 </body>
 </html>
