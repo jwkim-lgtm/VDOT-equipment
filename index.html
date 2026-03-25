@@ -565,23 +565,40 @@ function renderHdd(){
 
 function renderBackup(){
   const hddEqs=EQ.filter(e=>e.cat==='SSD'||e.cat==='HDD');
-  const statusOpts=['미백업','백업 중','백업 완료','해당없음'];
-  const ss={'백업 완료':'color:#27ae60;font-weight:600','백업 중':'color:#e67e22;font-weight:600','미백업':'color:#c0392b;font-weight:600','해당없음':'color:#aaa'};
+  const statusOpts=['—','백업 중','백업 완료'];
+  const ss={'백업 완료':'color:#27ae60;font-weight:600','백업 중':'color:#e67e22;font-weight:600','—':'color:#bbb'};
+
+  // NO 자동 부여 (코드 기준 정렬)
+  const sorted=[...hddEqs].sort((a,b)=>a.code.localeCompare(b.code));
+
   document.getElementById('tab-backup').innerHTML=`
-    <div class="section-header"><span class="section-title">외장하드 백업 현황 (${hddEqs.length}개)</span></div>
+    <div class="section-header">
+      <span class="section-title">외장하드 백업 현황 (${hddEqs.length}개)</span>
+      ${isAdmin?'<span style="font-size:11px;color:#aaa">관리자 모드: 직접 수정 가능</span>':''}
+    </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>코드</th><th>장비명</th><th>종류</th><th>연결 프로젝트</th><th>백업 상태</th><th>백업 날짜</th><th>담당자</th><th>메모</th></tr></thead>
-      <tbody>${hddEqs.map(e=>{
-        const proj=HDD_PROJECTS.find(p=>(p.equipIds||[]).includes(e.id));
+      <thead><tr><th>NO</th><th>코드</th><th>구분</th><th>프로젝트명</th><th>남은 용량</th><th>백업 상태</th><th>비고</th></tr></thead>
+      <tbody>${sorted.map((e,idx)=>{
         const bk=getBackup(e.id);
+        const statusStyle=ss[bk.status||'—']||'color:#bbb';
+        const activeC=CO.find(c=>c.status!=='returned'&&(c.items||[]).some(i=>i.eqId===e.id)&&!(c.returnedItems||[]).includes(e.id));
+        const inUse=activeC?'<span class="badge badge-out" style="font-size:10px;margin-left:4px">반출중</span>':'';
         return`<tr>
-          <td><span class="eq-code">${e.code}</span></td><td><span class="eq-name">${e.name}</span></td>
+          <td style="color:#888;font-size:12px;text-align:center">${idx+1}</td>
+          <td><span class="eq-code">${e.code}</span>${inUse}</td>
           <td><span class="cat-badge">${e.cat}</span></td>
-          <td>${proj?proj.project:'<span style="color:#bbb">미배정</span>'}</td>
-          <td>${isAdmin?`<select onchange="updateBackup('${e.id}','status',this.value)" style="width:auto;font-size:12px;padding:4px 8px;">${statusOpts.map(s=>`<option${bk.status===s?' selected':''}>${s}</option>`).join('')}</select>`:`<span style="${ss[bk.status]||''}">${bk.status}</span>`}</td>
-          <td>${isAdmin?`<input type="date" value="${bk.date||''}" onchange="updateBackup('${e.id}','date',this.value)" style="width:130px;font-size:12px;padding:4px 8px;">`:(bk.date||'—')}</td>
-          <td>${isAdmin?`<input type="text" value="${bk.manager||''}" placeholder="담당자" onchange="updateBackup('${e.id}','manager',this.value)" style="width:80px;font-size:12px;padding:4px 8px;">`:(bk.manager||'—')}</td>
-          <td>${isAdmin?`<input type="text" value="${bk.memo||''}" placeholder="메모" onchange="updateBackup('${e.id}','memo',this.value)" style="font-size:12px;padding:4px 8px;">`:(bk.memo||'—')}</td>
+          <td>${isAdmin
+            ?`<input type="text" value="${bk.project||''}" placeholder="프로젝트명 입력" onchange="updateBackup('${e.id}','project',this.value)" style="font-size:12px;padding:4px 8px;min-width:160px;">`
+            :(bk.project||'<span style="color:#bbb">—</span>')}</td>
+          <td>${isAdmin
+            ?`<input type="text" value="${bk.capacity||''}" placeholder="예) 2.5T" onchange="updateBackup('${e.id}','capacity',this.value)" style="width:80px;font-size:12px;padding:4px 8px;">`
+            :(bk.capacity||'<span style="color:#bbb">—</span>')}</td>
+          <td>${isAdmin
+            ?`<select onchange="updateBackup('${e.id}','status',this.value)" style="width:auto;font-size:12px;padding:4px 8px;">${statusOpts.map(s=>`<option${(bk.status||'—')===s?' selected':''}>${s}</option>`).join('')}</select>`
+            :`<span style="${statusStyle}">${bk.status||'—'}</span>`}</td>
+          <td>${isAdmin
+            ?`<input type="text" value="${bk.memo||''}" placeholder="비고" onchange="updateBackup('${e.id}','memo',this.value)" style="font-size:12px;padding:4px 8px;">`
+            :(bk.memo||'<span style="color:#bbb">—</span>')}</td>
         </tr>`;
       }).join('')}</tbody></table></div>`;
 }
