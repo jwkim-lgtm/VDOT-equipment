@@ -603,7 +603,7 @@ function renderBackup(){
   document.getElementById('tab-backup').innerHTML=`
     <div class="section-header">
       <span class="section-title">외장하드 백업 현황 (${hddEqs.length}개)</span>
-      ${isAdmin?`<div style="display:flex;gap:8px;align-items:center;"><span style="font-size:11px;color:#aaa">관리자 모드: 직접 수정 가능</span><button class="btn btn-sm" onclick="initBackupData()">시트 데이터 불러오기</button></div>`:''}
+      ${isAdmin?'<div style="display:flex;gap:8px;align-items:center;"><span style="font-size:11px;color:#aaa">관리자 모드: 직접 수정 가능</span><button class="btn btn-sm" onclick="initBackupData()">시트 데이터 불러오기</button></div>':''}
     </div>
     <div class="table-wrap"><table>
       <thead><tr><th>NO</th><th>코드</th><th>구분</th><th>프로젝트명</th><th>남은 용량</th><th>백업 상태</th><th>비고</th></tr></thead>
