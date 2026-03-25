@@ -605,8 +605,16 @@ function renderBackup(){
       <span class="section-title">외장하드 백업 현황 (${hddEqs.length}개)</span>
       ${isAdmin?'<div style="display:flex;gap:8px;align-items:center;"><span style="font-size:11px;color:#aaa">관리자 모드: 직접 수정 가능</span><button class="btn btn-sm" onclick="initBackupData()">시트 데이터 불러오기</button></div>':''}
     </div>
-    <div class="table-wrap"><table>
-      <thead><tr><th>NO</th><th>코드</th><th>구분</th><th>프로젝트명</th><th>남은 용량</th><th>백업 상태</th><th>비고</th></tr></thead>
+    <div class="table-wrap" style="overflow-x:auto;"><table style="min-width:900px;">
+      <thead><tr>
+  <th style="width:44px">NO</th>
+  <th style="width:90px">코드</th>
+  <th style="width:60px">구분</th>
+  <th style="min-width:280px">프로젝트명</th>
+  <th style="width:90px">남은 용량</th>
+  <th style="width:110px">백업 상태</th>
+  <th style="width:220px">비고</th>
+</tr></thead>
       <tbody>${sorted.map((e,idx)=>{
         const bk=getBackup(e.id);
         const statusStyle=ss[bk.status||'—']||'color:#bbb';
@@ -616,9 +624,9 @@ function renderBackup(){
           <td style="color:#888;font-size:12px;text-align:center">${idx+1}</td>
           <td><span class="eq-code">${e.code}</span>${inUse}</td>
           <td><span class="cat-badge">${e.cat}</span></td>
-          <td>${isAdmin
-            ?`<input type="text" value="${bk.project||''}" placeholder="프로젝트명 입력" onchange="updateBackup('${e.id}','project',this.value)" style="font-size:12px;padding:4px 8px;min-width:160px;">`
-            :(bk.project||'<span style="color:#bbb">—</span>')}</td>
+          <td style="max-width:320px">${isAdmin
+            ?`<input type="text" value="${bk.project||''}" placeholder="프로젝트명 입력" onchange="updateBackup('${e.id}','project',this.value)" style="font-size:12px;padding:4px 8px;width:100%;">`
+            :`<span style="font-size:13px;line-height:1.5;display:block">${bk.project||'<span style=\"color:#bbb\">—</span>'}</span>`}</td>
           <td>${isAdmin
             ?`<input type="text" value="${bk.capacity||''}" placeholder="예) 2.5T" onchange="updateBackup('${e.id}','capacity',this.value)" style="width:80px;font-size:12px;padding:4px 8px;">`
             :(bk.capacity||'<span style="color:#bbb">—</span>')}</td>
