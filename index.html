@@ -403,6 +403,35 @@ function activeItems(c){
   return(c.items||[]).filter(i=>!returned.includes(i.eqId));
 }
 
+
+// ── 백업 현황 초기 데이터 (시트 기준) ──
+const BACKUP_INIT_DATA = [
+  {code:'MHDD32', project:'ANANTI 230907', capacity:'', status:'—', memo:''},
+  {code:'MHDD31', project:'ANANTI 231101', capacity:'', status:'—', memo:''},
+  {code:'MHDD30', project:'ANANTI 240328', capacity:'', status:'—', memo:''},
+  {code:'MHDD29', project:'2025 4iren', capacity:'3.11 T', status:'—', memo:''},
+  {code:'MHDD12', project:'차놀자 / 한국정보인증 2025 LGU+1 EP.1-5', capacity:'962 GB', status:'—', memo:''},
+  {code:'MHDD33', project:'UNSECRET 01', capacity:'308 GB', status:'—', memo:''},
+  {code:'MHDD34', project:'UNSECRET 02', capacity:'', status:'—', memo:''},
+  {code:'MHDD28', project:'20250410_ELMT / 202510_ELMT', capacity:'2.9 T', status:'—', memo:''},
+  {code:'MHDD24', project:'2023,2024,2025 MDB 메인 오프닝 / SENSEE / 커뮤니케이션즈 / 아인스 녹색소비주간 / 코리아약국 / 아인스 Looping1,2 / [영등포] 청소년축제 / [한국산업공단] 아시아기능경기대회', capacity:'1.66 T', status:'—', memo:''},
+  {code:'MHDD26', project:'[DNA] 명장 Ep.1-6화', capacity:'62 GB', status:'—', memo:''},
+  {code:'MHDD05', project:'[DNA] 명장 Ep.7-10화', capacity:'3.31 T', status:'—', memo:''},
+  {code:'MHDD23', project:'[DNA] 우리동네라지트 Ep.1-3화', capacity:'163 GB', status:'—', memo:''},
+  {code:'MHDD14', project:'[DNA] 우리동네라지트 Ep.4-6화', capacity:'943 GB', status:'—', memo:''},
+  {code:'MHDD25', project:'[DNA] 지사사 Ep.1-6', capacity:'3.19 T', status:'—', memo:''},
+  {code:'MHDD27', project:'[EX-FE] EX-RIDE/HORROR/PUMPKIN/WINTER 스케치 / 스카이페스티빌 / [소피엘] 2025 소피엘 공간1,2', capacity:'1 T', status:'—', memo:'스카이페스티빌 프로젝트만 전달 받음 (소스 없음 / 88)'},
+  {code:'MHDD21', project:'[폴란] 브랜드필름 현재 작업본까지(10/15) 공간 소개 영상 / [대영앵텍]', capacity:'', status:'—', memo:'폴란 : 마스터라고 하기엔 아직 숨은 내막이 많음...(찐 마스터는 알 수 없음)'},
+  {code:'MHDD22', project:'[인디고] 포르투갈 티저+1화+2화 / 벨기에 티저+1화+2화 / 인포테인인트', capacity:'62 GB', status:'—', memo:''},
+  {code:'MHDD03', project:'[인디고] 피치스 페스티벌 스케치 / 오스트리아 티저+1화+2화 / 스페인 티저+1화+2화', capacity:'477 GB', status:'—', memo:''},
+  {code:'MHDD02', project:'[EX-FE] 9/12 실크로드 축제 / 1114 실크로드 누들페스타 / [인디고] 브랜드필름 / 월드투어 (티저+본편)', capacity:'463 GB', status:'—', memo:'인디고 브랜드필름 프로젝트만 전달 받음(소스 없음 / 88)'},
+  {code:'MHDD04', project:'[2025.05.12 한국교통대] 메인/멀티 리사이징/챌린지 영상/국원대동재/파빌리온 소개 영상/120 판찬사 AI / 나노메디컬 본편 콘텐츠/나노메디컬 AI 쇼츠/글로컬캠 스케치 촬영본/라이즈사업단 쇼츠 촬영본', capacity:'894 GB', status:'—', memo:'글로컬캠 프로젝트 전달 안 받기로 함'},
+  {code:'MHDD06', project:'[무빙픽처스] 대한영 유튜브 Ep.1-6 백업 완료 / (희의) 특별판 백업 완료', capacity:'1.04 T', status:'백업 완료', memo:''},
+  {code:'MHDD18', project:'[무빙픽처스] 대한영 유튜브 Ep.7-12 백업 완료', capacity:'319 GB', status:'백업 완료', memo:''},
+  {code:'MHDD09', project:'[무빙픽처스] 대한영 유튜브 EP.13-15 백업 완료 / EP.18 백업 완료 / EP.16-17(강릉),특별편2(노래방) 촬영본', capacity:'2.45 T', status:'백업 완료', memo:'특별편2(노래방) 저작권 이슈로 편집X / 강릉편부터 무빙픽처스에서 진행'},
+  {code:'MHDD20', project:'유니클로- 처음뵙겠습니다 EP.01 / KB 라이프생명 채용연계 콘텐츠 / 코오롱_4월 공기차 촬영본', capacity:'2.46 T', status:'—', memo:''},
+];
+
 function startListeners(){
   onSnapshot(query(collection(db,'equipments'),orderBy('createdAt','asc')),(snap)=>{EQ=snap.docs.map(d=>({id:d.id,...d.data()}));setSyncStatus(true);render();});
   onSnapshot(query(collection(db,'checkouts'),orderBy('createdAt','desc')),(snap)=>{CO=snap.docs.map(d=>({id:d.id,...d.data()}));checkOverdue();render();});
@@ -574,7 +603,7 @@ function renderBackup(){
   document.getElementById('tab-backup').innerHTML=`
     <div class="section-header">
       <span class="section-title">외장하드 백업 현황 (${hddEqs.length}개)</span>
-      ${isAdmin?'<span style="font-size:11px;color:#aaa">관리자 모드: 직접 수정 가능</span>':''}
+      ${isAdmin?`<div style="display:flex;gap:8px;align-items:center;"><span style="font-size:11px;color:#aaa">관리자 모드: 직접 수정 가능</span><button class="btn btn-sm" onclick="initBackupData()">시트 데이터 불러오기</button></div>`:''}
     </div>
     <div class="table-wrap"><table>
       <thead><tr><th>NO</th><th>코드</th><th>구분</th><th>프로젝트명</th><th>남은 용량</th><th>백업 상태</th><th>비고</th></tr></thead>
@@ -886,6 +915,33 @@ window.updateBackup=async function(eqId,field,value){
   const bk=BACKUPS.find(b=>b.eqId===eqId);
   if(bk) await updateDoc(doc(db,'backups',bk.id),{[field]:value});
   else await addDoc(collection(db,'backups'),{eqId,status:'미백업',date:'',manager:'',memo:'',[field]:value});
+};
+
+
+window.initBackupData = async function(){
+  if(!confirm('백업 현황 데이터를 시트 기준으로 초기화하시겠습니까?\n기존 데이터는 유지되고 코드가 없는 항목만 추가됩니다.')) return;
+  let added=0;
+  for(const item of BACKUP_INIT_DATA){
+    const eq=EQ.find(e=>e.code===item.code);
+    if(!eq) continue;
+    const existing=BACKUPS.find(b=>b.eqId===eq.id);
+    if(!existing){
+      await addDoc(collection(db,'backups'),{eqId:eq.id,...item});
+      added++;
+    } else {
+      // 프로젝트명, 용량, 상태, 메모가 비어있으면 업데이트
+      const updates={};
+      if(!existing.project&&item.project) updates.project=item.project;
+      if(!existing.capacity&&item.capacity) updates.capacity=item.capacity;
+      if((!existing.status||existing.status==='미백업')&&item.status&&item.status!=='—') updates.status=item.status;
+      if(!existing.memo&&item.memo) updates.memo=item.memo;
+      if(Object.keys(updates).length>0){
+        await updateDoc(doc(db,'backups',existing.id),updates);
+        added++;
+      }
+    }
+  }
+  showToast(`백업 현황 초기화 완료 (${added}건 업데이트)`);
 };
 
 startListeners();
