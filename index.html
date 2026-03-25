@@ -630,9 +630,14 @@ function renderBackup(){
           <td>${isAdmin
             ?`<input type="text" value="${bk.capacity||''}" placeholder="예) 2.5T" onchange="updateBackup('${e.id}','capacity',this.value)" style="width:80px;font-size:12px;padding:4px 8px;">`
             :(bk.capacity||'<span style="color:#bbb">—</span>')}</td>
-          <td>${isAdmin
-            ?`<select onchange="updateBackup('${e.id}','status',this.value)" style="width:auto;font-size:12px;padding:4px 8px;">${statusOpts.map(s=>`<option${(bk.status||'—')===s?' selected':''}>${s}</option>`).join('')}</select>`
-            :`<span style="${statusStyle}">${bk.status||'—'}</span>`}</td>
+          <td style="text-align:center">${isAdmin
+            ?`<select onchange="updateBackup('${e.id}','status',this.value)" style="width:90px;font-size:12px;padding:4px 6px;">${statusOpts.map(s=>`<option${(bk.status||'—')===s?' selected':''}>${s}</option>`).join('')}</select>`
+            :(bk.status==='백업 완료'
+              ?'<span class="badge badge-in" style="white-space:nowrap">백업 완료</span>'
+              :bk.status==='백업 중'
+              ?'<span class="badge badge-backup" style="white-space:nowrap">백업 중</span>'
+              :'<span style="color:#ccc;font-size:13px">—</span>')
+            }</td>
           <td>${isAdmin
             ?`<input type="text" value="${bk.memo||''}" placeholder="비고" onchange="updateBackup('${e.id}','memo',this.value)" style="font-size:12px;padding:4px 8px;">`
             :(bk.memo||'<span style="color:#bbb">—</span>')}</td>
