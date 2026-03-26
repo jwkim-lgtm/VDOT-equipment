@@ -214,6 +214,7 @@ input:focus,select:focus{border-color:#1a1a1a;}
   <div class="modal" style="width:500px;">
     <div class="modal-title">반납 처리</div>
     <p style="font-size:13px;color:#888;margin-bottom:1rem">반납할 장비를 선택해주세요. 사내 반출 장비는 별도로 선택해 반납할 수 있어요.</p>
+    <div class="form-row" style="margin-bottom:12px"><label class="form-label">반납자 <span style="color:#c0392b">*</span></label><input type="text" id="return-person" placeholder="반납 처리하는 담당자 이름"></div>
     <div class="table-wrap" id="return-list"></div>
     <div id="return-summary" style="font-size:12px;color:#27ae60;margin-top:8px;min-height:18px;"></div>
     <div class="modal-footer">
@@ -625,8 +626,8 @@ function renderBackup(){
           <td><span class="eq-code">${e.code}</span>${inUse}</td>
           <td><span class="cat-badge">${e.cat}</span></td>
           <td style="max-width:320px">${isAdmin
-            ?`<input type="text" value="${bk.project||''}" placeholder="프로젝트명 입력" onchange="updateBackup('${e.id}','project',this.value)" style="font-size:12px;padding:4px 8px;width:100%;">`
-            :`<span style="font-size:13px;line-height:1.5;display:block">${bk.project||'<span style=\"color:#bbb\">—</span>'}</span>`}</td>
+            ?`<textarea onchange="updateBackup('${e.id}','project',this.value)" style="font-size:12px;padding:6px 8px;width:100%;min-height:60px;resize:vertical;line-height:1.5;">${bk.project||''}</textarea>`
+            :`<span style="font-size:12px;line-height:1.6;display:block;white-space:pre-wrap">${bk.project||'<span style=\"color:#bbb\">—</span>'}</span>`}</td>
           <td>${isAdmin
             ?`<input type="text" value="${bk.capacity||''}" placeholder="예) 2.5T" onchange="updateBackup('${e.id}','capacity',this.value)" style="width:80px;font-size:12px;padding:4px 8px;">`
             :(bk.capacity||'<span style="color:#bbb">—</span>')}</td>
@@ -639,7 +640,7 @@ function renderBackup(){
               :'<span style="color:#ccc;font-size:13px">—</span>')
             }</td>
           <td>${isAdmin
-            ?`<input type="text" value="${bk.memo||''}" placeholder="비고" onchange="updateBackup('${e.id}','memo',this.value)" style="font-size:12px;padding:4px 8px;">`
+            ?`<textarea onchange="updateBackup('${e.id}','memo',this.value)" style="font-size:12px;padding:6px 8px;width:100%;min-height:50px;resize:vertical;line-height:1.5;">${bk.memo||''}</textarea>`
             :(bk.memo||'<span style="color:#bbb">—</span>')}</td>
         </tr>`;
       }).join('')}</tbody></table></div>`;
@@ -675,12 +676,14 @@ function renderHistory(){
       <input type="date" id="hist-to" value="${to}" onchange="renderHistory()" style="width:140px;" title="반출일 종료">
     </div>
     <div class="table-wrap"><table>
-    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 (유형)</th><th>반출일</th><th>반납일</th><th>메모</th></tr></thead>
-    <tbody>${returned.length===0?`<tr><td colspan="6"><div class="empty">조건에 맞는 이력이 없습니다.</div></td></tr>`:returned.map(c=>`<tr>
+    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 (유형)</th><th>반출일</th><th>반납일</th><th>반납자</th><th>메모</th>${isAdmin?"<th></th>":""}</tr></thead>
+    <tbody>${returned.length===0?`<tr><td colspan="8"><div class="empty">조건에 맞는 이력이 없습니다.</div></td></tr>`:returned.map(c=>`<tr>
       <td>${c.person}</td><td>${c.project||'—'}</td>
       <td style="min-width:200px">${(c.items||[]).map(i=>`<div class="req-eq-row">${eqTag(i.eqId,i.type)}</div>`).join('')}</td>
       <td>${c.outDate}</td><td>${c.returnedDate||'—'}</td>
+      <td style="font-size:12px;color:#1a1a1a">${c.returnPerson?`<strong>${c.returnPerson}</strong>${c.confirmedAt?`<br><span style="font-size:11px;color:#aaa">${c.confirmedAt}</span>`:''}` :'<span style="color:#bbb">—</span>'}</td>
       <td style="font-size:12px;color:#888">${c.note||'—'}</td>
+      ${isAdmin?`<td><button class="btn btn-sm btn-danger" onclick="deleteHistory('${c.id}')">삭제</button></td>`:'<td></td>'}
     </tr>`).join('')}</tbody></table></div>`;
 }
 
@@ -704,6 +707,7 @@ window.switchTab=function(t,el){
 window.openReturn=function(coId){
   returningCoId=coId;
   const c=CO.find(x=>x.id===coId);if(!c)return;
+  document.getElementById('return-person').value='';
   const items=activeItems(c);
   document.getElementById('return-list').innerHTML=`<table><tbody>${items.map(i=>{
     const eq=getEq(i.eqId);
@@ -729,16 +733,20 @@ window.updateReturnSummary=function(){
 
 window.confirmReturn=async function(){
   const c=CO.find(x=>x.id===returningCoId);if(!c)return;
+  const returnPerson=document.getElementById('return-person').value.trim();
+  if(!returnPerson){alert('반납자 이름을 입력해주세요.');return;}
   const toReturn=[...document.querySelectorAll('#return-list input:checked')].map(i=>i.dataset.eq);
   if(!toReturn.length){alert('반납할 장비를 선택해주세요.');return;}
   const allItemIds=(c.items||[]).map(i=>i.eqId);
   const alreadyReturned=c.returnedItems||[];
   const newReturned=[...new Set([...alreadyReturned,...toReturn])];
   const allDone=allItemIds.every(id=>newReturned.includes(id));
-  const update={returnedItems:newReturned};
+  const now=new Date();
+  const confirmedAt=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const update={returnedItems:newReturned,returnPerson,confirmedAt};
   if(allDone){update.status='returned';update.returnedDate=today();}
   await updateDoc(doc(db,'checkouts',returningCoId),update);
-  showToast(allDone?'전체 반납 완료':'선택 장비 반납 완료');
+  showToast(allDone?`${returnPerson} 반납 완료`:`${returnPerson} 선택 장비 반납 완료`);
   closeModal('modal-return');
 };
 
@@ -955,6 +963,13 @@ window.initBackupData = async function(){
     }
   }
   showToast(`백업 현황 초기화 완료 (${added}건 업데이트)`);
+};
+
+
+window.deleteHistory=async function(id){
+  if(!confirm('이 반출 이력을 삭제하시겠습니까?\n삭제 후 복구가 불가능합니다.'))return;
+  await deleteDoc(doc(db,'checkouts',id));
+  showToast('이력 삭제 완료');
 };
 
 startListeners();
