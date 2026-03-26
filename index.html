@@ -214,7 +214,16 @@ input:focus,select:focus{border-color:#1a1a1a;}
   <div class="modal" style="width:500px;">
     <div class="modal-title">반납 처리</div>
     <p style="font-size:13px;color:#888;margin-bottom:1rem">반납할 장비를 선택해주세요. 사내 반출 장비는 별도로 선택해 반납할 수 있어요.</p>
-    <div class="form-row" style="margin-bottom:12px"><label class="form-label">반납자 <span style="color:#c0392b">*</span></label><input type="text" id="return-person" placeholder="반납 처리하는 담당자 이름"></div>
+    <div class="form-grid" style="margin-bottom:12px">
+      <div class="form-row"><label class="form-label">반납자 <span style="color:#c0392b">*</span></label><input type="text" id="return-person" placeholder="장비를 반납하는 담당자"></div>
+      <div class="form-row"><label class="form-label">확인자 (관리자) <span style="color:#c0392b">*</span></label>
+        <select id="return-confirmer">
+          <option value="김종원">김종원</option>
+          <option value="양수빈">양수빈</option>
+          <option value="이상협">이상협</option>
+        </select>
+      </div>
+    </div>
     <div class="table-wrap" id="return-list"></div>
     <div id="return-summary" style="font-size:12px;color:#27ae60;margin-top:8px;min-height:18px;"></div>
     <div class="modal-footer">
@@ -681,7 +690,9 @@ function renderHistory(){
       <td>${c.person}</td><td>${c.project||'—'}</td>
       <td style="min-width:200px">${(c.items||[]).map(i=>`<div class="req-eq-row">${eqTag(i.eqId,i.type)}</div>`).join('')}</td>
       <td>${c.outDate}</td><td>${c.returnedDate||'—'}</td>
-      <td style="font-size:12px;color:#1a1a1a">${c.returnPerson?`<strong>${c.returnPerson}</strong>${c.confirmedAt?`<br><span style="font-size:11px;color:#aaa">${c.confirmedAt}</span>`:''}` :'<span style="color:#bbb">—</span>'}</td>
+      <td style="font-size:12px;color:#1a1a1a">${c.returnPerson
+  ?`<strong>${c.returnPerson}</strong><br><span style="font-size:11px;color:#888">확인: ${c.returnConfirmer||'—'}</span>${c.confirmedAt?`<br><span style="font-size:11px;color:#aaa">${c.confirmedAt}</span>`:''}`
+  :'<span style="color:#bbb">—</span>'}</td>
       <td style="font-size:12px;color:#888">${c.note||'—'}</td>
       ${isAdmin?`<td><button class="btn btn-sm btn-danger" onclick="deleteHistory('${c.id}')">삭제</button></td>`:'<td></td>'}
     </tr>`).join('')}</tbody></table></div>`;
@@ -708,6 +719,7 @@ window.openReturn=function(coId){
   returningCoId=coId;
   const c=CO.find(x=>x.id===coId);if(!c)return;
   document.getElementById('return-person').value='';
+  document.getElementById('return-confirmer').value='김종원';
   const items=activeItems(c);
   document.getElementById('return-list').innerHTML=`<table><tbody>${items.map(i=>{
     const eq=getEq(i.eqId);
@@ -734,6 +746,7 @@ window.updateReturnSummary=function(){
 window.confirmReturn=async function(){
   const c=CO.find(x=>x.id===returningCoId);if(!c)return;
   const returnPerson=document.getElementById('return-person').value.trim();
+  const returnConfirmer=document.getElementById('return-confirmer').value;
   if(!returnPerson){alert('반납자 이름을 입력해주세요.');return;}
   const toReturn=[...document.querySelectorAll('#return-list input:checked')].map(i=>i.dataset.eq);
   if(!toReturn.length){alert('반납할 장비를 선택해주세요.');return;}
@@ -743,7 +756,7 @@ window.confirmReturn=async function(){
   const allDone=allItemIds.every(id=>newReturned.includes(id));
   const now=new Date();
   const confirmedAt=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  const update={returnedItems:newReturned,returnPerson,confirmedAt};
+  const update={returnedItems:newReturned,returnPerson,returnConfirmer,confirmedAt};
   if(allDone){update.status='returned';update.returnedDate=today();}
   await updateDoc(doc(db,'checkouts',returningCoId),update);
   showToast(allDone?`${returnPerson} 반납 완료`:`${returnPerson} 선택 장비 반납 완료`);
