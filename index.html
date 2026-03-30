@@ -837,10 +837,18 @@ function buildReqList(search,cat){
   const filtered=EQ.filter(e=>(!cat||e.cat===cat)&&(!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search)));
   document.getElementById('req-eq-list').innerHTML=filtered.map(e=>{
     const isOut=!isEqAvailable(e.id);
-    const checked=itemTypes[e.id]!==undefined;
+    const bkStatus=(e.cat==='SSD'||e.cat==='HDD')?getBackup(e.id).status:'';
+    const isBackedUp=bkStatus==='백업 완료'||bkStatus==='백업 중';
+    const isDisabled=isOut||isBackedUp;
+    const checked=itemTypes[e.id]!==undefined&&!isDisabled;
     const curType=itemTypes[e.id]||'normal';
-    return`<div class="eq-check-item${isOut?' disabled':''}${checked?' checked':''}" id="item-row-${e.id}">
-      <input type="checkbox" data-eq="${e.id}" ${isOut?'disabled':''} ${checked?'checked':''} onchange="toggleEqItem('${e.id}',this.checked)">
+    const disabledBadge=isBackedUp
+      ?(bkStatus==='백업 완료'
+        ?'<span class="badge badge-backup-done" style="font-size:10px;white-space:nowrap">백업완료·반출불가</span>'
+        :'<span class="badge badge-backup" style="font-size:10px;white-space:nowrap">백업중·반출불가</span>')
+      :isOut?'<span class="badge badge-out" style="font-size:10px;white-space:nowrap">반출 중</span>':'';
+    return`<div class="eq-check-item${isDisabled?' disabled':''}${checked?' checked':''}" id="item-row-${e.id}">
+      <input type="checkbox" data-eq="${e.id}" ${isDisabled?'disabled':''} ${checked?'checked':''} onchange="toggleEqItem('${e.id}',this.checked)">
       <div class="eq-check-info">
         <div><span class="eq-code">${e.code}</span> <span class="eq-name">${e.name}</span></div>
         <div style="font-size:11px;color:#888;margin-top:2px">${e.cat}${e.note?' · '+e.note:''}</div>
@@ -849,7 +857,7 @@ function buildReqList(search,cat){
         <button class="type-pill normal${curType==='normal'?' active':''}" onclick="setItemType('${e.id}','normal')">일반반출</button>
         <button class="type-pill internal${curType==='internal'?' active':''}" onclick="setItemType('${e.id}','internal')">사내반출</button>
       </div>
-      ${isOut?'<span class="badge badge-out" style="font-size:10px;white-space:nowrap">반출 중</span>':''}
+      ${disabledBadge}
     </div>`;
   }).join('');
   updateReqSummary();
@@ -873,10 +881,18 @@ window.filterReqList=function(){
   const filtered=EQ.filter(e=>(!cat||e.cat===cat)&&(!search||e.name.toLowerCase().includes(search)||e.code.toLowerCase().includes(search)));
   document.getElementById('req-eq-list').innerHTML=filtered.map(e=>{
     const isOut=!isEqAvailable(e.id);
-    const checked=itemTypes[e.id]!==undefined;
+    const bkStatus=(e.cat==='SSD'||e.cat==='HDD')?getBackup(e.id).status:'';
+    const isBackedUp=bkStatus==='백업 완료'||bkStatus==='백업 중';
+    const isDisabled=isOut||isBackedUp;
+    const checked=itemTypes[e.id]!==undefined&&!isDisabled;
     const curType=itemTypes[e.id]||'normal';
-    return`<div class="eq-check-item${isOut?' disabled':''}${checked?' checked':''}" id="item-row-${e.id}">
-      <input type="checkbox" data-eq="${e.id}" ${isOut?'disabled':''} ${checked?'checked':''} onchange="toggleEqItem('${e.id}',this.checked)">
+    const disabledBadge=isBackedUp
+      ?(bkStatus==='백업 완료'
+        ?'<span class="badge badge-backup-done" style="font-size:10px;white-space:nowrap">백업완료·반출불가</span>'
+        :'<span class="badge badge-backup" style="font-size:10px;white-space:nowrap">백업중·반출불가</span>')
+      :isOut?'<span class="badge badge-out" style="font-size:10px;white-space:nowrap">반출 중</span>':'';
+    return`<div class="eq-check-item${isDisabled?' disabled':''}${checked?' checked':''}" id="item-row-${e.id}">
+      <input type="checkbox" data-eq="${e.id}" ${isDisabled?'disabled':''} ${checked?'checked':''} onchange="toggleEqItem('${e.id}',this.checked)">
       <div class="eq-check-info">
         <div><span class="eq-code">${e.code}</span> <span class="eq-name">${e.name}</span></div>
         <div style="font-size:11px;color:#888;margin-top:2px">${e.cat}${e.note?' · '+e.note:''}</div>
@@ -885,7 +901,7 @@ window.filterReqList=function(){
         <button class="type-pill normal${curType==='normal'?' active':''}" onclick="setItemType('${e.id}','normal')">일반반출</button>
         <button class="type-pill internal${curType==='internal'?' active':''}" onclick="setItemType('${e.id}','internal')">사내반출</button>
       </div>
-      ${isOut?'<span class="badge badge-out" style="font-size:10px;white-space:nowrap">반출 중</span>':''}
+      ${disabledBadge}
     </div>`;
   }).join('');
   updateReqSummary();
