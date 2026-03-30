@@ -537,12 +537,9 @@ function renderAdmin(){
         <button class="btn btn-sm btn-danger" onclick="rejectRequest('${r.id}')">반려</button>
       </div></td>
     </tr>`).join('')}</tbody></table></div>`;
-  html+=`<div class="section-header"><span class="section-title">처리 완료</span></div>`;
-  html+=done.length?`<div class="table-wrap"><table>
-    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 수</th><th>반출일</th><th>결과</th></tr></thead>
-    <tbody>${done.map(r=>`<tr><td>${r.person}</td><td>${r.project||'—'}</td><td>${(r.items||[]).length}개</td><td>${r.outDate}</td>
-      <td>${r.status==='approved'?'<span class="badge badge-in">승인</span>':'<span class="badge badge-rejected">반려</span>'}</td></tr>`).join('')}</tbody></table></div>`
-    :'<div class="empty">처리된 신청이 없습니다.</div>';
+    html+=`<div style="margin-top:12px;padding:12px 16px;background:#f5f5f5;border-radius:8px;font-size:12px;color:#888">
+    처리 완료된 반출 건은 <strong style="color:#1a1a1a">반출 이력</strong> 탭에서 확인하세요.
+  </div>`;
   document.getElementById('tab-admin').innerHTML=html;
 }
 
@@ -562,10 +559,13 @@ function renderEquipment(){
       <tbody>${filtered.map(e=>{
         const activeC=CO.find(c=>c.status!=='returned'&&(c.items||[]).some(i=>i.eqId===e.id)&&!(c.returnedItems||[]).includes(e.id));
         const itemType=activeC?(activeC.items||[]).find(i=>i.eqId===e.id)?.type:null;
-        const badge=!activeC?'<span class="badge badge-in">보유 중</span>'
+        const bkState=(e.cat==='SSD'||e.cat==='HDD')?getBackup(e.id).status:'';
+        const bkBadge=bkState==='백업 완료'?'<span class="badge badge-backup-done" style="margin-left:4px;font-size:10px">백업완료</span>'
+          :bkState==='백업 중'?'<span class="badge badge-backup" style="margin-left:4px;font-size:10px">백업중</span>':'';
+        const badge=(!activeC?'<span class="badge badge-in">보유 중</span>'
           :itemType==='internal'?'<span class="badge badge-internal">사내 반출</span>'
           :activeC.status==='overdue'?'<span class="badge badge-overdue">연체</span>'
-          :'<span class="badge badge-out">반출 중</span>';
+          :'<span class="badge badge-out">반출 중</span>')+bkBadge;
         return`<tr><td><span class="eq-code">${e.code}</span></td>
           <td><span class="eq-name">${e.name}</span>${e.note?`<br><span style="font-size:11px;color:#bbb">${e.note}</span>`:''}</td>
           <td><span class="cat-badge">${e.cat}</span></td><td>${e.qty}</td>
@@ -579,26 +579,71 @@ function renderHdd(){
   const hddEqs=EQ.filter(e=>e.cat==='SSD'||e.cat==='HDD');
   const usedIds=HDD_PROJECTS.flatMap(p=>p.equipIds||[]);
   const unused=hddEqs.filter(e=>!usedIds.includes(e.id));
+  const hddSubTabEl=document.getElementById('hdd-sub-tab');
+  const hddSubTab=hddSubTabEl?hddSubTabEl.dataset.active||'all':'all';
   function bkClass(id){const bk=getBackup(id);return bk.status==='백업 완료'?'backed':bk.status==='백업 중'?'backing':'';}
   function bkBadge(id){const bk=getBackup(id);return bk.status==='백업 완료'?'<span class="badge badge-backup-done" style="font-size:10px;margin-left:4px">백업완료</span>':bk.status==='백업 중'?'<span class="badge badge-backup" style="font-size:10px;margin-left:4px">백업중</span>':bk.status==='미백업'?'<span class="badge" style="font-size:10px;margin-left:4px;background:#fff3e0;color:#e65100">미백업</span>':'';}
-  let html=`<div class="section-header"><span class="section-title">프로젝트별 외장하드</span>${isAdmin?`<button class="btn btn-sm btn-primary" onclick="openHdd()">+ 프로젝트 연결</button>`:''}</div>`;
+  // 상태별 필터
+  const allCount=hddEqs.length;
+  const availCount=hddEqs.filter(e=>!CO.some(c=>c.status!=='returned'&&(c.items||[]).some(i=>i.eqId===e.id)&&!(c.returnedItems||[]).includes(e.id))).length;
+  const outCount=hddEqs.filter(e=>{const ac=CO.find(c=>c.status!=='returned'&&(c.items||[]).some(i=>i.eqId===e.id)&&!(c.returnedItems||[]).includes(e.id));return ac&&(ac.items||[]).find(i=>i.eqId===e.id)?.type!=='internal';}).length;
+  const internalCount=hddEqs.filter(e=>{const ac=CO.find(c=>c.status!=='returned'&&(c.items||[]).some(i=>i.eqId===e.id)&&!(c.returnedItems||[]).includes(e.id));return ac&&(ac.items||[]).find(i=>i.eqId===e.id)?.type==='internal';}).length;
+
+  let html=`
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+    <div class="sub-tab-bar" style="margin-bottom:0" id="hdd-sub-tab" data-active="${hddSubTab}">
+      <button class="sub-tab${hddSubTab==='all'?' active':''}" onclick="setHddSubTab('all')">전체 (${allCount})</button>
+      <button class="sub-tab${hddSubTab==='available'?' active':''}" onclick="setHddSubTab('available')">보유 중 (${availCount})</button>
+      <button class="sub-tab${hddSubTab==='out'?' active':''}" onclick="setHddSubTab('out')">반출 중 (${outCount})</button>
+      <button class="sub-tab${hddSubTab==='internal'?' active':''}" onclick="setHddSubTab('internal')">사내 반출 (${internalCount})</button>
+    </div>
+    ${isAdmin?`<button class="btn btn-sm btn-primary" onclick="openHdd()">+ 프로젝트 연결</button>`:''}
+  </div>`;
+
+  // 서브탭 필터 적용
+  const filteredHdds=hddEqs.filter(e=>{
+    if(hddSubTab==='all') return true;
+    const ac=CO.find(c=>c.status!=='returned'&&(c.items||[]).some(i=>i.eqId===e.id)&&!(c.returnedItems||[]).includes(e.id));
+    const iType=ac?(ac.items||[]).find(i=>i.eqId===e.id)?.type:null;
+    if(hddSubTab==='available') return !ac;
+    if(hddSubTab==='out') return ac&&iType!=='internal';
+    if(hddSubTab==='internal') return ac&&iType==='internal';
+    return true;
+  });
+
+  // 프로젝트별 섹션 (전체/보유중 탭에서만 표시)
+  if(hddSubTab==='all'||hddSubTab==='available'){
+    html+=`<div class="section-header" style="margin-top:4px"><span class="section-title">프로젝트별 외장하드</span></div>`;
   html+=HDD_PROJECTS.length?HDD_PROJECTS.map(p=>{
     const eqs=(p.equipIds||[]).map(id=>getEq(id));
     return`<div class="hdd-card"><div class="hdd-project-title"><span>${p.project}</span>${isAdmin?`<button class="btn btn-sm btn-danger" onclick="deleteHddProject('${p.id}')">삭제</button>`:''}</div>
       <div class="hdd-chips">${eqs.map(e=>`<span class="hdd-chip ${bkClass(e.id)}"><span class="eq-code" style="font-size:11px">${e.code}</span><span class="eq-name" style="font-size:12px">${e.name}</span>${bkBadge(e.id)}</span>`).join('')}</div>
     </div>`;
   }).join(''):'<div class="empty" style="margin-bottom:1rem">연결된 프로젝트가 없습니다.</div>';
-  html+=`<div class="section-header" style="margin-top:1.5rem"><span class="section-title">미배정 외장하드 (${unused.length}개)</span></div>`;
-  html+=unused.length?`<div class="table-wrap"><table>
-    <thead><tr><th>코드</th><th>장비명</th><th>종류</th><th>백업 상태</th><th>상태</th></tr></thead>
-    <tbody>${unused.map(e=>{
-      const bk=getBackup(e.id);
-      const activeC=CO.find(c=>c.status!=='returned'&&(c.items||[]).some(i=>i.eqId===e.id)&&!(c.returnedItems||[]).includes(e.id));
-      const iType=activeC?(activeC.items||[]).find(i=>i.eqId===e.id)?.type:null;
-      const stBadge=!activeC?'<span class="badge badge-in">보유 중</span>':iType==='internal'?'<span class="badge badge-internal">사내 반출</span>':'<span class="badge badge-out">반출 중</span>';
-      const bkB=bk.status==='백업 완료'?'<span class="badge badge-backup-done">백업완료</span>':bk.status==='백업 중'?'<span class="badge badge-backup">백업중</span>':'<span style="color:#bbb;font-size:12px">—</span>';
-      return`<tr><td><span class="eq-code">${e.code}</span></td><td><span class="eq-name">${e.name}</span></td><td><span class="cat-badge">${e.cat}</span></td><td>${bkB}</td><td>${stBadge}</td></tr>`;
-    }).join('')}</tbody></table></div>`:'<div class="empty">모든 외장하드가 프로젝트에 배정되어 있습니다.</div>';
+  }
+
+  // 상태별 필터링된 장비 목록 테이블
+  if(hddSubTab!=='all'||filteredHdds.length){
+    const showList=hddSubTab==='all'?unused:filteredHdds;
+    const listTitle=hddSubTab==='all'?`미배정 외장하드 (${unused.length}개)`:
+      hddSubTab==='available'?`보유 중 (${filteredHdds.length}개)`:
+      hddSubTab==='out'?`반출 중 (${filteredHdds.length}개)`:
+      `사내 반출 중 (${filteredHdds.length}개)`;
+    if(hddSubTab!=='all'||unused.length){
+      html+=`<div class="section-header" style="margin-top:${hddSubTab==='all'?'1.5rem':'4px'}"><span class="section-title">${listTitle}</span></div>`;
+      const listData=hddSubTab==='all'?unused:filteredHdds;
+      html+=listData.length?`<div class="table-wrap"><table>
+        <thead><tr><th>코드</th><th>장비명</th><th>종류</th><th>백업 상태</th><th>상태</th></tr></thead>
+        <tbody>${listData.map(e=>{
+          const bk=getBackup(e.id);
+          const activeC=CO.find(c=>c.status!=='returned'&&(c.items||[]).some(i=>i.eqId===e.id)&&!(c.returnedItems||[]).includes(e.id));
+          const iType=activeC?(activeC.items||[]).find(i=>i.eqId===e.id)?.type:null;
+          const stBadge=!activeC?'<span class="badge badge-in">보유 중</span>':iType==='internal'?'<span class="badge badge-internal">사내 반출</span>':'<span class="badge badge-out">반출 중</span>';
+          const bkB=bk.status==='백업 완료'?'<span class="badge badge-backup-done">백업완료</span>':bk.status==='백업 중'?'<span class="badge badge-backup">백업중</span>':'<span style="color:#bbb;font-size:12px">—</span>';
+          return`<tr><td><span class="eq-code">${e.code}</span></td><td><span class="eq-name">${e.name}</span></td><td><span class="cat-badge">${e.cat}</span></td><td>${bkB}</td><td>${stBadge}</td></tr>`;
+        }).join('')}</tbody></table></div>`:'<div class="empty">해당 상태의 외장하드가 없습니다.</div>';
+    }
+  }
   document.getElementById('tab-hdd').innerHTML=html;
 }
 
@@ -708,6 +753,13 @@ function render(){
   else if(tab==='backup') renderBackup();
   else renderHistory();
 }
+
+
+window.setHddSubTab=function(t){
+  const el=document.getElementById('hdd-sub-tab');
+  if(el) el.dataset.active=t;
+  renderHdd();
+};
 
 window.switchTab=function(t,el){
   tab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');
