@@ -479,7 +479,7 @@ function renderStats(){
 function checkoutTable(list){
   if(!list.length) return '<div class="empty">반출 중인 장비가 없습니다.</div>';
   return`<div class="table-wrap"><table>
-    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 (유형)</th><th>반출일</th><th>예정 반납일</th><th>상태</th><th></th></tr></thead>
+    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 (유형)</th><th>반출일</th><th>예정 반납일</th><th>상태</th><th>관리자 메모</th><th></th></tr></thead>
     <tbody>${list.map(c=>{
       const items=activeItems(c);
       const eqList=items.map(i=>`<div class="req-eq-row">${eqTag(i.eqId,i.type)}</div>`).join('');
@@ -492,6 +492,10 @@ function checkoutTable(list){
         <td>${c.outDate}</td>
         <td>${allInternal(c)?'<span style="color:#aaa;font-size:12px">유연</span>':c.returnDate||'—'}</td>
         <td>${badge}${internalBadge}</td>
+        <td style="min-width:160px">${isAdmin
+          ?`<input type="text" value="${c.adminMemo||''}" placeholder="메모 입력" onchange="updateAdminMemo('${c.id}',this.value)" style="font-size:12px;padding:5px 8px;width:100%;border:1px solid #ddd;border-radius:6px;">`
+          :(c.adminMemo?`<span style="font-size:12px;color:#555">${c.adminMemo}</span>`:'<span style="color:#ddd">—</span>')
+          }</td>
         <td>${isAdmin?`<div style="display:flex;gap:6px;"><button class="btn btn-sm btn-pdf" onclick="showPdf('${c.id}')">PDF</button><button class="btn btn-sm btn-success" onclick="openReturn('${c.id}')">반납</button></div>`:'—'}</td>
       </tr>`;
     }).join('')}</tbody></table></div>`;
@@ -554,11 +558,32 @@ function renderEquipment(){
   const cats=[...new Set(EQ.map(e=>e.cat))];
   const catF=document.getElementById('eq-cf')?document.getElementById('eq-cf').value:'전체';
   const srch=document.getElementById('eq-sf')?document.getElementById('eq-sf').value.toLowerCase():'';
-  const filtered=EQ.filter(e=>(catF==='전체'||e.cat===catF)&&(!srch||e.name.toLowerCase().includes(srch)||e.code.toLowerCase().includes(srch)));
+  const eqSort=document.getElementById('eq-sort')?document.getElementById('eq-sort').value:'code';
+  let filtered=EQ.filter(e=>(catF==='전체'||e.cat===catF)&&(!srch||e.name.toLowerCase().includes(srch)||e.code.toLowerCase().includes(srch)));
+  // 정렬
+  filtered=[...filtered].sort((a,b)=>{
+    if(eqSort==='code') return a.code.localeCompare(b.code);
+    if(eqSort==='cat') return a.cat.localeCompare(b.cat)||a.code.localeCompare(b.code);
+    if(eqSort==='name') return a.name.localeCompare(b.name);
+    if(eqSort==='status'){
+      const order={'overdue':0,'out':1,'internal':2,'in':3};
+      const sa=eqStatus(a.id);const sb=eqStatus(b.id);
+      return (order[sa]??3)-(order[sb]??3)||a.code.localeCompare(b.code);
+    }
+    if(eqSort==='added') return (a.createdAt||0)-(b.createdAt||0);
+    return 0;
+  });
   document.getElementById('tab-equipment').innerHTML=`
     <div class="filter-bar">
       <select id="eq-cf" onchange="renderEquipment()"><option>전체</option>${cats.map(c=>`<option${catF===c?' selected':''}>${c}</option>`).join('')}</select>
       <input type="text" id="eq-sf" placeholder="장비명 또는 코드 검색" value="${srch}" oninput="renderEquipment()">
+      <select id="eq-sort" onchange="renderEquipment()" style="width:auto;min-width:110px;">
+        <option value="code"${eqSort==='code'?' selected':''}>코드순</option>
+        <option value="cat"${eqSort==='cat'?' selected':''}>카테고리순</option>
+        <option value="name"${eqSort==='name'?' selected':''}>장비명순</option>
+        <option value="status"${eqSort==='status'?' selected':''}>상태순</option>
+        <option value="added"${eqSort==='added'?' selected':''}>추가순</option>
+      </select>
       ${isAdmin?`<button class="btn btn-sm btn-primary" onclick="openEquipModal()">+ 장비 추가</button>`:''}
     </div>
     <div class="table-wrap"><table>
@@ -1053,6 +1078,11 @@ window.initBackupData = async function(){
   showToast(`백업 현황 초기화 완료 (${added}건 업데이트)`);
 };
 
+
+
+window.updateAdminMemo=async function(id,value){
+  await updateDoc(doc(db,'checkouts',id),{adminMemo:value});
+};
 
 window.deleteHistory=async function(id){
   if(!confirm('이 반출 이력을 삭제하시겠습니까?\n삭제 후 복구가 불가능합니다.'))return;
