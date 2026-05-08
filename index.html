@@ -479,7 +479,7 @@ function renderStats(){
 function checkoutTable(list){
   if(!list.length) return '<div class="empty">반출 중인 장비가 없습니다.</div>';
   return`<div class="table-wrap"><table>
-    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 (유형)</th><th>반출일</th><th>예정 반납일</th><th>상태</th><th>관리자 메모</th><th></th></tr></thead>
+    <thead><tr><th>신청자</th><th>프로젝트</th><th>장비 (유형)</th><th>반출일</th><th>예정 반납일</th><th>상태</th><th>신청 메모</th><th>관리자 메모</th><th></th></tr></thead>
     <tbody>${list.map(c=>{
       const items=activeItems(c);
       const eqList=items.map(i=>`<div class="req-eq-row">${eqTag(i.eqId,i.type)}</div>`).join('');
@@ -492,6 +492,7 @@ function checkoutTable(list){
         <td>${c.outDate}</td>
         <td>${allInternal(c)?'<span style="color:#aaa;font-size:12px">유연</span>':c.returnDate||'—'}</td>
         <td>${badge}${internalBadge}</td>
+        <td style="font-size:12px;color:#555">${c.note||'<span style="color:#ddd">—</span>'}</td>
         <td style="min-width:160px">${isAdmin
           ?`<input type="text" value="${c.adminMemo||''}" placeholder="메모 입력" onchange="updateAdminMemo('${c.id}',this.value)" style="font-size:12px;padding:5px 8px;width:100%;border:1px solid #ddd;border-radius:6px;">`
           :(c.adminMemo?`<span style="font-size:12px;color:#555">${c.adminMemo}</span>`:'<span style="color:#ddd">—</span>')
